@@ -1,5 +1,6 @@
 import { fetch } from 'undici';
 import type { RequestInit, RequestSchema, ValidatedResponse } from './typings';
+import { ApiResponseError } from './errors';
 
 export async function request<Schema extends RequestSchema>(
   init: RequestInit,
@@ -8,24 +9,39 @@ export async function request<Schema extends RequestSchema>(
   if (schema.searchParams) {
     const valid = schema.searchParams.safeParse(init.url);
     if (!valid.success) {
-      throw new Error(valid.error.message);
+      throw new Error('ErrorSearchPrams: Invalid Args. ' + valid.error.message);
     }
   }
 
   if (schema.body) {
     const valid = schema.body.safeParse(init.body);
     if (!valid.success) {
-      throw new Error(valid.error.message);
+      throw new Error('ErrorBody: Invalid Args. ' + valid.error.message);
     }
   }
 
-  const response = await fetch(init.url, init);
+  let body: string | undefined = undefined;
+  if (init.body) {
+    body = JSON.stringify(init.body);
+  }
+
+  const { url, strictSchema, ...restInit } = init;
+  const response = await fetch(url, {
+    ...restInit,
+    body
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new ApiResponseError(`${response.statusText}\n${text}`, response);
+  }
+
   const json = await response.json();
 
-  if (schema.response) {
+  if (false !== strictSchema && schema.response) {
     const valid = schema.response.safeParse(json);
     if (!valid.success) {
-      throw new Error(valid.error.message);
+      throw new ApiResponseError('Server response did not match client schema.', response);
     }
     return valid.data;
   }

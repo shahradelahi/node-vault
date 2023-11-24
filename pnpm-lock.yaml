@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  lodash.pick:
+    specifier: ^4.4.0
+    version: 4.4.0
   mustache:
     specifier: ^4.2.0
     version: 4.2.0
@@ -16,6 +19,9 @@ dependencies:
     version: 3.22.4
 
 devDependencies:
+  '@types/lodash.pick':
+    specifier: ^4.4.9
+    version: 4.4.9
   '@types/mocha':
     specifier: ^10.0.6
     version: 10.0.6
@@ -75,6 +81,16 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
+
+  /@types/lodash.pick@4.4.9:
+    resolution: {integrity: sha512-hDpr96x9xHClwy1KX4/RXRejqjDFTEGbEMT3t6wYSYeFDzxmMnSKB/xHIbktRlPj8Nii2g8L5dtFDRaNFBEzUQ==}
+    dependencies:
+      '@types/lodash': 4.14.202
+    dev: true
+
+  /@types/lodash@4.14.202:
+    resolution: {integrity: sha512-OvlIYQK9tNneDlS0VN54LLd5uiPCBOp7gS5Z0f1mjoJYBrtStzgmJBxONW3U6OZqdtNzZPmn9BS/7WI7BFFcFQ==}
+    dev: true
 
   /@types/mocha@10.0.6:
     resolution: {integrity: sha512-dJvrYWxP/UcXm36Qn36fxhUKu8A/xMRXVT2cliFF1Z7UA9liG5Psj3ezNSZw+5puH2czDXRLcXQxf8JbJt0ejg==}
@@ -444,6 +460,10 @@ packages:
     dependencies:
       p-locate: 5.0.0
     dev: true
+
+  /lodash.pick@4.4.0:
+    resolution: {integrity: sha512-hXt6Ul/5yWjfklSGvLQl8vM//l3FtyHZeuelpzK6mm99pNvN9yTDruNZPEJZD1oWrqo+izBmB7oUfWgcCX7s4Q==}
+    dev: false
 
   /log-symbols@4.1.0:
     resolution: {integrity: sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==}

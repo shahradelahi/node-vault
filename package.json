@@ -1,6 +1,7 @@
 {
-  "name": "node-vault",
-  "version": "0.1.0",
+  "name": "@litehex/node-vault",
+  "version": "0.1.0-alpha.1",
+  "private": false,
   "description": "Client for HashiCorp's Vault",
   "author": "Shahrad Elahi <shahrad@litehex.com> (https://github.com/shahradelahi)",
   "main": "build/src/index.js",
@@ -11,15 +12,30 @@
   },
   "scripts": {
     "build": "rimraf build && tsc",
+    "prepublish": "npm run build",
     "format:check": "prettier --plugin-search-dir . --check .",
     "format:write": "prettier --plugin-search-dir . --write ."
   },
+  "keywords": [
+    "hashcorp",
+    "vault",
+    "client",
+    "secrets",
+    "node",
+    "bun"
+  ],
+  "files": [
+    "build/src"
+  ],
+  "packageManager": "pnpm@8.9.2",
   "dependencies": {
+    "lodash.pick": "^4.4.0",
     "mustache": "^4.2.0",
     "undici": "^5.27.2",
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/lodash.pick": "^4.4.9",
     "@types/mocha": "^10.0.6",
     "@types/mustache": "^4.2.5",
     "@types/node": "^20.9.4",

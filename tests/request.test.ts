@@ -1,7 +1,7 @@
-import { request } from '@/request.ts';
+import { request } from '../src/request';
 import { z } from 'zod';
 import { Headers } from 'undici';
-import { promisify } from './utils.ts';
+import { promisify } from './utils';
 import 'dotenv/config';
 
 describe('Fetch with Zod Schema', () => {
