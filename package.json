@@ -1,0 +1,35 @@
+{
+  "name": "node-vault",
+  "version": "0.1.0",
+  "description": "Client for HashiCorp's Vault",
+  "author": "Shahrad Elahi <shahrad@litehex.com> (https://github.com/shahradelahi)",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/shahradelahi/node-vault.git"
+  },
+  "scripts": {
+    "build": "rimraf build && tsc",
+    "format:check": "prettier --plugin-search-dir . --check .",
+    "format:write": "prettier --plugin-search-dir . --write ."
+  },
+  "dependencies": {
+    "mustache": "^4.2.0",
+    "undici": "^5.27.2",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.6",
+    "@types/mustache": "^4.2.5",
+    "@types/node": "^20.9.4",
+    "chalk": "^5.3.0",
+    "dotenv": "^16.3.1",
+    "mocha": "^10.2.0",
+    "prettier": "^3.1.0",
+    "rimraf": "^5.0.5",
+    "tsconfig-paths": "^4.2.0",
+    "type-fest": "^4.8.2",
+    "typescript": "^5.3.2"
+  }
+}
