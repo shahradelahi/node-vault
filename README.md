@@ -17,7 +17,7 @@ import { Client } from '@litehex/node-vault';
 const vc = new Client({
   apiVersion: 'v1', // default
   endpoint: 'http://127.0.0.1:8200', // default
-  token: 'hv.xxxxxxxxxxxxxxxxxxxxx' // Optional unless you want to initialize the vault
+  token: 'hv.xxxxxxxxxxxxxxxxxxxxx' // Optional incase of you want to initialize the vault
 });
 
 // Init vault
