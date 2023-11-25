@@ -27,7 +27,10 @@ describe('node-vault', () => {
   it('should write secret', () => {
     return promisify(async () => {
       const result = await client.write({
-        path: 'secret/data/test'
+        path: 'secret/data/test',
+        data: {
+          foo: 'bar'
+        }
       });
       console.log(result);
     });

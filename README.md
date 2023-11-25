@@ -10,7 +10,7 @@ npm install @litehex/node-vault
 
 ##### Init and unseal vault
 
-```js
+```ts
 import { Client } from '@litehex/node-vault';
 
 // Get a new instance of the client
@@ -31,10 +31,10 @@ vc.init({ secret_shares: 1, secret_threshold: 1 }).then((res) => {
 
 ##### Write, read and delete secrets
 
-```js
+```ts
 vc.write({ path: 'secret/hello', data: { foo: 'bar' } }).then(() => {
   vc.read({ path: 'secret/hello' }).then(({ data }) => {
-    console.log(data); // { value: 'world' }
+    console.log(data); // { foo: 'bar' }
   });
 });
 
@@ -49,7 +49,7 @@ vc.delete({ path: 'secret/hello' });
 
 ##### Using a proxy or having the ability to modify the outgoing request.
 
-```js
+```ts
 import { Client } from '@litehex/node-vault';
 import { ProxyAgent } from 'undici';
 
@@ -58,13 +58,17 @@ const agent = new ProxyAgent('http://localhost:8080');
 const vc = new Client({
   // ... other params
   request: {
-    agent: agent,
+    dispatcher: agent,
     headers: {
       'X-Custom-Header': 'value'
     }
   }
 });
 ```
+
+### Credits
+
+This project is inspired by [kr1sp1n/node-vault](https://github.com/kr1sp1n/node-vault), and thanks to the contributors for their efforts.
 
 ### License
 

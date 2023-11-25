@@ -23,7 +23,7 @@ export type ValidatedResponse<T extends RequestSchema> = T['response'] extends z
 export type CommandArgs<Schema extends RequestSchema> =
   (Schema['searchParams'] extends z.ZodObject<any> ? z.infer<Schema['searchParams']> : {}) &
     (Schema['body'] extends z.ZodAny
-      ? Record<string, string | number | boolean | null>
+      ? Record<string, Serializable>
       : Schema['body'] extends z.ZodObject<any>
         ? z.infer<Schema['body']>
         : {}) &
@@ -33,3 +33,11 @@ export type CommandFn<Schema extends RequestSchema> = (
   args?: CommandArgs<Schema>,
   options?: Omit<RequestInit, 'url'>
 ) => Promise<ValidatedResponse<Schema>>;
+
+export type Serializable =
+  | string
+  | number
+  | boolean
+  | null
+  | Serializable[]
+  | { [key: string]: Serializable };
