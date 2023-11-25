@@ -126,3 +126,5 @@ const AuthSchema = z.object({
 });
 
 export type * from './typings';
+
+export { generateCommand };

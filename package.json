@@ -2,31 +2,31 @@
   "name": "@litehex/node-vault",
   "version": "0.1.0-alpha.3",
   "private": false,
-  "description": "Client for HashiCorp's Vault",
-  "author": "Shahrad Elahi <shahrad@litehex.com> (https://github.com/shahradelahi)",
-  "main": "build/src/index.js",
-  "types": "build/src/index.d.ts",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/shahradelahi/node-vault.git"
+  "description": "Node.js client for the HashiCorp's Vault API",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**"
+  ],
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
   },
   "scripts": {
-    "build": "rimraf build && tsc",
-    "prepublish": "npm run build",
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
     "format:check": "prettier --plugin-search-dir . --check .",
-    "format:write": "prettier --plugin-search-dir . --write ."
+    "format:write": "prettier --plugin-search-dir . --write .",
+    "prepublishOnly": "npm run build"
   },
-  "keywords": [
-    "hashcorp",
-    "vault",
-    "client",
-    "secrets",
-    "node",
-    "bun"
-  ],
-  "files": [
-    "build/src"
-  ],
   "packageManager": "pnpm@8.9.2",
   "dependencies": {
     "lodash.pick": "^4.4.0",
@@ -45,7 +45,26 @@
     "prettier": "^3.1.0",
     "rimraf": "^5.0.5",
     "tsconfig-paths": "^4.2.0",
+    "tsup": "^8.0.1",
     "type-fest": "^4.8.2",
     "typescript": "^5.3.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/shahradelahi/node-vault.git"
+  },
+  "keywords": [
+    "hashcorp",
+    "vault",
+    "client",
+    "secrets",
+    "node",
+    "bun"
+  ],
+  "author": "Shahrad Elahi <shahrad@litehex.com> (https://github.com/shahradelahi)",
+  "license": "LGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/shahradelahi/node-vault/issues"
+  },
+  "homepage": "https://github.com/shahradelahi/node-vault#readme"
 }
