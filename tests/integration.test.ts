@@ -17,10 +17,17 @@ describe('node-vault', () => {
 
   it('should read secret', () => {
     return promisify(async () => {
-      const result = await client.read({
-        path: 'secret/data/test'
-      });
+      const result = await client.read(
+        {
+          path: 'secret/data/test',
+          list: false
+        },
+        { strictSchema: false }
+      );
       console.log(result);
+      if (result && result.data) {
+        console.log(result.data.data);
+      }
     });
   });
 

@@ -1,6 +1,6 @@
 {
   "name": "@litehex/node-vault",
-  "version": "0.1.0-alpha.4",
+  "version": "0.1.0-alpha.8",
   "private": false,
   "description": "Node.js client for the HashiCorp's Vault API",
   "main": "dist/index.js",
@@ -29,12 +29,14 @@
   },
   "packageManager": "pnpm@8.9.2",
   "dependencies": {
+    "lodash.omit": "^4.5.0",
     "lodash.pick": "^4.4.0",
     "mustache": "^4.2.0",
     "undici": "^5.27.2",
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/lodash.omit": "^4.5.9",
     "@types/lodash.pick": "^4.4.9",
     "@types/mocha": "^10.0.6",
     "@types/mustache": "^4.2.5",

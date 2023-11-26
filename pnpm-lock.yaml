@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  lodash.omit:
+    specifier: ^4.5.0
+    version: 4.5.0
   lodash.pick:
     specifier: ^4.4.0
     version: 4.4.0
@@ -19,6 +22,9 @@ dependencies:
     version: 3.22.4
 
 devDependencies:
+  '@types/lodash.omit':
+    specifier: ^4.5.9
+    version: 4.5.9
   '@types/lodash.pick':
     specifier: ^4.4.9
     version: 4.4.9
@@ -429,6 +435,12 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
+
+  /@types/lodash.omit@4.5.9:
+    resolution: {integrity: sha512-zuAVFLUPJMOzsw6yawshsYGgq2hWUHtsZgeXHZmSFhaQQFC6EQ021uDKHkSjOpNhSvtNSU9165/o3o/Q51GpTw==}
+    dependencies:
+      '@types/lodash': 4.14.202
+    dev: true
 
   /@types/lodash.pick@4.4.9:
     resolution: {integrity: sha512-hDpr96x9xHClwy1KX4/RXRejqjDFTEGbEMT3t6wYSYeFDzxmMnSKB/xHIbktRlPj8Nii2g8L5dtFDRaNFBEzUQ==}
@@ -968,6 +980,10 @@ packages:
     dependencies:
       p-locate: 5.0.0
     dev: true
+
+  /lodash.omit@4.5.0:
+    resolution: {integrity: sha512-XeqSp49hNGmlkj2EJlfrQFIzQ6lXdNro9sddtQzcJY8QaoC2GO0DT7xaIokHeyM+mIT0mPMlPvkYzg2xCuHdZg==}
+    dev: false
 
   /lodash.pick@4.4.0:
     resolution: {integrity: sha512-hXt6Ul/5yWjfklSGvLQl8vM//l3FtyHZeuelpzK6mm99pNvN9yTDruNZPEJZD1oWrqo+izBmB7oUfWgcCX7s4Q==}

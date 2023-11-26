@@ -1,17 +1,21 @@
 import { fetch } from 'undici';
-import type { RequestInit, RequestSchema, ValidatedResponse } from './typings';
+import type { RequestInit, RequestSchema, ValidatedResponse } from '../typings';
 import { ApiResponseError } from './errors';
+import pick from 'lodash.pick';
 
 export async function request<Schema extends RequestSchema>(
   init: RequestInit,
   schema: Schema
 ): Promise<ValidatedResponse<Schema>> {
-  if (schema.searchParams) {
-    const valid = schema.searchParams.safeParse(init.url);
-    if (!valid.success) {
-      throw new Error('ErrorSearchPrams: Invalid Args. ' + valid.error.message);
-    }
-  }
+  // todo: add support for searchParams
+  // if (schema.searchParams) {
+  //   const params = new URL(init.url).searchParams;
+  //   const picked = pick(params, Object.keys(schema.searchParams.shape));
+  //   const valid = schema.searchParams.safeParse(init.url);
+  //   if (!valid.success) {
+  //     throw new Error('ErrorSearchPrams: Invalid Args. ' + valid.error.message);
+  //   }
+  // }
 
   if (schema.body) {
     const valid = schema.body.safeParse(init.body);

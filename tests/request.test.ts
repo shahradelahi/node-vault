@@ -1,4 +1,4 @@
-import { request } from '../src/request';
+import { request } from '../src/lib/request';
 import { z } from 'zod';
 import { Headers } from 'undici';
 import { promisify } from './utils';

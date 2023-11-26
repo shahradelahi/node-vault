@@ -1,7 +1,16 @@
 import { z } from 'zod';
-import { CommandInit, generateCommand } from './utils/generate-command';
-import { RequestInit, RequestSchema } from './typings';
+import { CommandInit, generateCommand, generateCommandRequestInit } from './utils/generate-command';
+import { CommandArgs, RequestInit, RequestSchema, ValidatedResponse } from './typings';
 import { PartialDeep } from 'type-fest';
+import { request } from './lib/request';
+import {
+  AnyEngineSchema,
+  Engine,
+  EngineAction,
+  EngineName,
+  engines,
+  EngineSchema
+} from './lib/engine';
 
 const ClientOptionsSchema = z.object({
   endpoint: z.string().optional(),
@@ -44,57 +53,35 @@ export class Client {
     }
   }
 
-  status = generateCommand({
-    method: 'GET',
-    path: '/sys/seal-status',
-    client: this,
-    schema: {
-      response: z.object({
-        sealed: z.boolean(),
-        t: z.number(),
-        n: z.number(),
-        progress: z.number()
-      })
-    }
-  });
+  async read<Engine extends EngineName = any>(
+    query: QueryArgs<Engine, 'read'>,
+    options: Omit<RequestInit, 'url'> = {}
+  ): Promise<ValidatedResponse<EngineSchema<Engine>['read']>> {
+    const { engine, ...args } = query || {};
 
-  init = generateCommand({
-    method: 'PUT',
-    path: '/sys/init',
-    client: this,
-    schema: {
-      body: z.object({
-        secret_shares: z.number(),
-        secret_threshold: z.number()
-      }),
-      response: z.object({
-        keys: z.array(z.string()),
-        keys_base64: z.array(z.string()),
-        root_token: z.string()
-      })
-    }
-  });
+    const schema =
+      engine && engines[engine] && engines[engine]['read']
+        ? engines[engine]['read']
+        : AnyEngineSchema;
 
-  read = generateCommand({
-    method: 'GET',
-    path: '/{{path}}',
-    client: this,
-    schema: {
-      path: z.object({
-        path: z.string()
-      }),
-      response: z.record(z.any())
-    }
-  });
+    const init = await generateCommandRequestInit(
+      {
+        method: 'GET',
+        path: '/{{path}}',
+        client: this,
+        schema
+      },
+      args as any,
+      options
+    );
+
+    return request<any>(init, schema);
+  }
 
   write = generateCommand({
     method: 'POST',
     path: '/{{path}}',
     client: this,
-    refine: (init, params) => {
-      console.log('refine', init, params);
-      return init;
-    },
     schema: {
       path: z.object({
         path: z.string()
@@ -115,15 +102,126 @@ export class Client {
       response: z.record(z.any())
     }
   });
+
+  /**
+   * @link https://developer.hashicorp.com/vault/api-docs/system/seal-status#seal-status
+   */
+  status = generateCommand({
+    method: 'GET',
+    path: '/sys/seal-status',
+    client: this,
+    schema: {
+      response: z.object({
+        type: z.string(),
+        initialized: z.boolean(),
+        sealed: z.boolean(),
+        t: z.number(),
+        n: z.number(),
+        progress: z.number(),
+        nonce: z.string(),
+        version: z.string(),
+        build_date: z.string(),
+        migration: z.boolean(),
+        recovery_seal: z.boolean(),
+        storage_type: z.string()
+      })
+    }
+  });
+
+  /**
+   * @link https://developer.hashicorp.com/vault/api-docs/system/init#read-initialization-status
+   */
+  initialized = generateCommand({
+    method: 'GET',
+    path: '/sys/init',
+    client: this,
+    schema: {
+      response: z.object({
+        initialized: z.boolean()
+      })
+    }
+  });
+
+  /**
+   * @link https://developer.hashicorp.com/vault/api-docs/system/init#start-initialization
+   */
+  init = generateCommand({
+    method: 'POST',
+    path: '/sys/init',
+    client: this,
+    schema: {
+      body: z.object({
+        pgp_keys: z.array(z.string()).optional(),
+        root_token_pgp_key: z.string().default('').optional(),
+        secret_shares: z.number(),
+        secret_threshold: z.number(),
+        stored_shares: z.number().optional(),
+        recovery_shares: z.number().default(0).optional(),
+        recovery_threshold: z.number().default(0).optional(),
+        recovery_pgp_keys: z.array(z.string()).optional()
+      }),
+      response: z.object({
+        keys: z.array(z.string()),
+        keys_base64: z.array(z.string()),
+        root_token: z.string()
+      })
+    }
+  });
+
+  /**
+   * @link https://developer.hashicorp.com/vault/api-docs/system/unseal#submit-unseal-key
+   */
+  unseal = generateCommand({
+    method: 'POST',
+    path: '/sys/unseal',
+    client: this,
+    schema: {
+      body: z.object({
+        key: z.string(),
+        reset: z.boolean().default(false).optional(),
+        migrate: z.boolean().default(false).optional()
+      }),
+      response: z.discriminatedUnion('sealed', [
+        z.object({
+          sealed: z.literal(true),
+          t: z.number(),
+          n: z.number(),
+          progress: z.number(),
+          version: z.string()
+        }),
+        z.object({
+          sealed: z.literal(false),
+          t: z.number(),
+          n: z.number(),
+          progress: z.number(),
+          version: z.string(),
+          cluster_name: z.string(),
+          cluster_id: z.string()
+        })
+      ])
+    }
+  });
+
+  /**
+   * @link https://developer.hashicorp.com/vault/api-docs/system/seal#seal
+   */
+  seal = generateCommand({
+    method: 'POST',
+    path: '/sys/seal',
+    client: this,
+    schema: {
+      response: z.record(z.any())
+    }
+  });
 }
 
-const AuthSchema = z.object({
-  client_token: z.string(),
-  policies: z.array(z.string()),
-  metadata: z.any(),
-  lease_duration: z.number(),
-  renewable: z.boolean()
-});
+type QueryArgs<Name extends EngineName, Action extends EngineAction> = Name extends EngineName
+  ? EngineSchema<Name> extends Engine
+    ? CommandArgs<EngineSchema<Name>[Action]> & {
+        engine?: Name;
+      }
+    : never
+  : never;
 
 export type * from './typings';
 
