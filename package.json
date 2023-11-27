@@ -27,7 +27,7 @@
     "format:write": "prettier --plugin-search-dir . --write .",
     "prepublishOnly": "npm run build"
   },
-  "packageManager": "pnpm@8.9.2",
+  "packageManager": "pnpm@8.11.0",
   "dependencies": {
     "lodash.pick": "^4.4.0",
     "mustache": "^4.2.0",
