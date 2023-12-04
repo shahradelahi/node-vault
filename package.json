@@ -1,6 +1,6 @@
 {
   "name": "@litehex/node-vault",
-  "version": "0.1.0-alpha.8",
+  "version": "0.1.0-alpha.9",
   "private": false,
   "description": "Node.js client for the HashiCorp's Vault API",
   "main": "dist/index.js",

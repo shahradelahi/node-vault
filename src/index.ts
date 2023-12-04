@@ -213,6 +213,87 @@ export class Client {
       response: z.record(z.any())
     }
   });
+
+  /**
+   * @link https://developer.hashicorp.com/vault/api-docs/system/generate-root#read-root-generation-progress
+   */
+  getRootGenerationProgress = generateCommand({
+    method: 'GET',
+    path: '/sys/generate-root/attempt',
+    client: this,
+    schema: {
+      response: z.object({
+        started: z.boolean(),
+        nonce: z.string(),
+        progress: z.number(),
+        required: z.number(),
+        encoded_token: z.string(),
+        pgp_fingerprint: z.string(),
+        otp_length: z.number(),
+        complete: z.boolean()
+      })
+    }
+  });
+
+  /**
+   * @link https://developer.hashicorp.com/vault/api-docs/system/generate-root#start-root-token-generation
+   */
+  startRootGeneration = generateCommand({
+    method: 'POST',
+    path: '/sys/generate-root/attempt',
+    client: this,
+    schema: {
+      body: z.object({
+        otp: z.string()
+      }),
+      response: z.object({
+        started: z.boolean(),
+        nonce: z.string(),
+        progress: z.number(),
+        required: z.number(),
+        encoded_token: z.string(),
+        otp: z.string(),
+        otp_length: z.number(),
+        complete: z.boolean()
+      })
+    }
+  });
+
+  /**
+   * @link https://developer.hashicorp.com/vault/api-docs/system/generate-root#cancel-root-generation
+   */
+  cancelRootGeneration = generateCommand({
+    method: 'DELETE',
+    path: '/sys/generate-root/attempt',
+    client: this,
+    schema: {
+      response: z.record(z.any())
+    }
+  });
+
+  /**
+   * @link https://developer.hashicorp.com/vault/api-docs/system/generate-root#provide-key-share-to-generate-root
+   */
+  provideKeyShare = generateCommand({
+    method: 'POST',
+    path: '/sys/generate-root/update',
+    client: this,
+    schema: {
+      body: z.object({
+        key: z.string(),
+        nonce: z.string()
+      }),
+      response: z.object({
+        started: z.boolean(),
+        nonce: z.string(),
+        progress: z.number(),
+        required: z.number(),
+        pgp_fingerprint: z.string(),
+        complete: z.boolean(),
+        encoded_token: z.string()
+      })
+    }
+  });
 }
 
 type QueryArgs<Name extends EngineName, Action extends EngineAction> = Name extends EngineName
