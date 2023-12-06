@@ -1,16 +1,7 @@
 import { z } from 'zod';
-import { CommandInit, generateCommand, generateCommandRequestInit } from './utils/generate-command';
-import { CommandArgs, RequestInit, RequestSchema, ValidatedResponse } from './typings';
+import { CommandInit, generateCommand } from './utils/generate-command';
+import { RequestInit, RequestSchema } from './typings';
 import { PartialDeep } from 'type-fest';
-import { request } from './lib/request';
-import {
-  AnyEngineSchema,
-  Engine,
-  EngineAction,
-  EngineName,
-  engines,
-  EngineSchema
-} from './lib/engine';
 import { kv2 } from './engine/kv2';
 
 const ClientOptionsSchema = z.object({
@@ -45,43 +36,22 @@ export class Client {
     this.request = request;
   }
 
-  private assignCommands<T extends RequestSchema>(
-    commands: Record<string, Omit<CommandInit<T>, 'client'>>
-  ) {
-    for (const [name, init] of Object.entries(commands)) {
-      // @ts-ignore
-      this[name] = generateCommand({ ...init, client: this });
-    }
-  }
-
   kv2() {
     return kv2(this);
   }
 
-  async read<Engine extends EngineName = any>(
-    query: QueryArgs<Engine, 'read'>,
-    options: Omit<RequestInit, 'url'> = {}
-  ): Promise<ValidatedResponse<EngineSchema<Engine>['read']>> {
-    const { engine, ...args } = query || {};
-
-    const schema =
-      engine && engines[engine] && engines[engine]['read']
-        ? engines[engine]['read']
-        : AnyEngineSchema;
-
-    const init = await generateCommandRequestInit(
-      {
-        method: 'GET',
-        path: '/{{path}}',
-        client: this,
-        schema
-      },
-      args as any,
-      options
-    );
-
-    return request<any>(init, schema);
-  }
+  read = generateCommand({
+    method: 'GET',
+    path: '/{{path}}',
+    client: this,
+    schema: {
+      path: z.object({
+        path: z.string()
+      }),
+      body: z.any(),
+      response: z.any()
+    }
+  });
 
   write = generateCommand({
     method: 'POST',
@@ -92,7 +62,7 @@ export class Client {
         path: z.string()
       }),
       body: z.any(),
-      response: z.record(z.any())
+      response: z.any()
     }
   });
 
@@ -300,14 +270,6 @@ export class Client {
     }
   });
 }
-
-type QueryArgs<Name extends EngineName, Action extends EngineAction> = Name extends EngineName
-  ? EngineSchema<Name> extends Engine
-    ? CommandArgs<EngineSchema<Name>[Action]> & {
-        engine?: Name;
-      }
-    : never
-  : never;
 
 export type * from './typings';
 

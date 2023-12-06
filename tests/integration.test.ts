@@ -1,11 +1,28 @@
-import { Client } from '../src';
+import { Client, generateCommand } from '../src';
 import { promisify } from './utils';
+import { z } from 'zod';
 import 'dotenv/config';
 
 describe('node-vault', () => {
   const client = new Client({
     endpoint: process.env.VAULT_ENDPOINT_URL,
     token: process.env.VAULT_TOKEN
+  });
+
+  it('should be able to implement custom command', () => {
+    const fooCommand = generateCommand({
+      path: '/sys/seal-status',
+      method: 'GET',
+      client,
+      schema: {
+        response: z.any()
+      }
+    });
+
+    return promisify(async () => {
+      const result = await fooCommand();
+      console.log(result);
+    });
   });
 
   it('should get seal status', () => {
@@ -17,17 +34,10 @@ describe('node-vault', () => {
 
   it('should read secret', () => {
     return promisify(async () => {
-      const result = await client.read(
-        {
-          path: 'secret/data/test',
-          list: false
-        },
-        { strictSchema: false }
-      );
+      const result = await client.read({
+        path: 'secret/data/test'
+      });
       console.log(result);
-      if (result && result.data) {
-        console.log(result.data.data);
-      }
     });
   });
 
