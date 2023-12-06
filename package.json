@@ -1,6 +1,6 @@
 {
   "name": "@litehex/node-vault",
-  "version": "0.1.0-alpha.9",
+  "version": "0.1.0-alpha.10",
   "private": false,
   "description": "Node.js client for the HashiCorp's Vault API",
   "main": "dist/index.js",
@@ -64,7 +64,7 @@
     "bun"
   ],
   "author": "Shahrad Elahi <shahrad@litehex.com> (https://github.com/shahradelahi)",
-  "license": "LGPL-3.0-or-later",
+  "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/shahradelahi/node-vault/issues"
   },

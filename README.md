@@ -32,20 +32,46 @@ vc.init({ secret_shares: 1, secret_threshold: 1 }).then((res) => {
 ##### Write, read and delete secrets
 
 ```ts
-vc.write({ path: 'secret/hello', data: { foo: 'bar' } }).then(() => {
-  vc.read({ path: 'secret/hello' }).then(({ data }) => {
-    console.log(data); // { foo: 'bar' }
-  });
+vc.write({ path: 'secret/hello', data: { foo: 'bar' } }).then(async () => {
+  const data = await vc.read({ path: 'secret/hello' });
+  console.log(data); // { data: { foo: 'bar' }, ... }
+  await vc.delete({ path: 'secret/hello' });
 });
-
-vc.delete({ path: 'secret/hello' });
 ```
 
 ### Docs
 
-- HashCorp's Vault [API docs](https://developer.hashicorp.com/vault/api-docs)
+- HashiCorp's Vault [API docs](https://developer.hashicorp.com/vault/api-docs)
 
 ### Examples
+
+##### Custom command implementation
+
+```ts
+import { generateCommand } from '@litehex/node-vault';
+import { z } from 'zod';
+
+const status = generateCommand({
+  path: '/sys/seal-status',
+  method: 'GET',
+  client: vc,
+  // refine: change the request before sending
+  refine: (req) => {
+    req.headers['X-Custom-Header'] = 'value';
+    return req;
+  },
+  schema: {
+    // path: use this to fill the path template
+    // searchParams
+    // body: schema for request body
+    response: z.any()
+  }
+});
+
+status().then((res) => {
+  console.log(res);
+});
+```
 
 ##### Using a proxy or having the ability to modify the outgoing request.
 
