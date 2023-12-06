@@ -2,6 +2,8 @@ import { fetch } from 'undici';
 import type { RequestInit, RequestSchema, ValidatedResponse } from '../typings';
 import { ApiResponseError } from './errors';
 import pick from 'lodash.pick';
+import { json } from 'node:stream/consumers';
+import { isJson } from '../utils/is-json';
 
 export async function request<Schema extends RequestSchema>(
   init: RequestInit,
@@ -40,15 +42,34 @@ export async function request<Schema extends RequestSchema>(
     throw new ApiResponseError(`${response.statusText}\n${text}`, response);
   }
 
-  const json = await response.json();
-
-  if (false !== strictSchema && schema.response) {
-    const valid = schema.response.safeParse(json);
-    if (!valid.success) {
-      throw new ApiResponseError('Server response did not match client schema.', response);
-    }
-    return valid.data;
+  // Check is there a body in response
+  if (response.headers.get('content-length') === '0') {
+    return {} as ValidatedResponse<Schema>;
   }
 
-  return json as unknown as ValidatedResponse<Schema>;
+  const raw = await response.text();
+  if (raw === '') {
+    return {} as ValidatedResponse<Schema>;
+  }
+
+  // If response was json, parse it and validate
+  if (response.headers.get('content-type')?.includes('application/json')) {
+    if (!isJson(raw)) {
+      throw new ApiResponseError('Server response was not valid JSON.', response);
+    }
+    const json = JSON.parse(raw);
+
+    if (false !== strictSchema && schema.response) {
+      const valid = schema.response.safeParse(json);
+      if (!valid.success) {
+        throw new ApiResponseError('Server response did not match client schema.', response);
+      }
+      return valid.data;
+    }
+
+    return json as unknown as ValidatedResponse<Schema>;
+  }
+
+  // Otherwise, return the raw text
+  return raw as unknown as ValidatedResponse<Schema>;
 }
