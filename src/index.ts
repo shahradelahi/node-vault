@@ -11,6 +11,7 @@ import {
   engines,
   EngineSchema
 } from './lib/engine';
+import { kv2 } from './engine/kv2';
 
 const ClientOptionsSchema = z.object({
   endpoint: z.string().optional(),
@@ -51,6 +52,10 @@ export class Client {
       // @ts-ignore
       this[name] = generateCommand({ ...init, client: this });
     }
+  }
+
+  kv2() {
+    return kv2(this);
   }
 
   async read<Engine extends EngineName = any>(

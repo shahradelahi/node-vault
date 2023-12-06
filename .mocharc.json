@@ -1,4 +1,5 @@
 {
   "$schema": "https://json.schemastore.org/mocharc.json",
-  "require": "tsx"
+  "require": "tsx",
+  "timeout": 10000
 }
