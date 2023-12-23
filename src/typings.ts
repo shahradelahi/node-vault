@@ -21,7 +21,9 @@ export type ValidatedResponse<T extends RequestSchema> = T['response'] extends z
     ? JsonObject
     : T['response'] extends z.ZodObject<any>
       ? z.infer<T['response']>
-      : unknown;
+      : T['response'] extends z.ZodDiscriminatedUnion<any, any>
+        ? z.infer<T['response']>
+        : unknown;
 
 export type CommandArgs<Schema extends RequestSchema> =
   (Schema['searchParams'] extends z.ZodObject<any> ? z.infer<Schema['searchParams']> : {}) &

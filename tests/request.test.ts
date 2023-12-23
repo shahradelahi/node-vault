@@ -2,7 +2,6 @@ import { request } from '../src/lib/request';
 import { z } from 'zod';
 import { Headers } from 'undici';
 import { promisify } from './utils';
-import 'dotenv/config';
 
 describe('Fetch with Zod Schema', () => {
   it('Get seal status', () => {

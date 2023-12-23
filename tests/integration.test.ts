@@ -1,7 +1,7 @@
 import { Client, generateCommand } from '../src';
 import { promisify } from './utils';
 import { z } from 'zod';
-import 'dotenv/config';
+import { expect } from 'chai';
 
 describe('node-vault', () => {
   const client = new Client({
@@ -29,6 +29,25 @@ describe('node-vault', () => {
     return promisify(async () => {
       const result = await client.status();
       console.log(result);
+    });
+  });
+
+  it('should seal and unseal vault', () => {
+    return promisify(async () => {
+      const result = await client.status();
+      if (!result.sealed) {
+        console.log('Sealing vault...');
+        await client.seal();
+      }
+
+      console.log('Unsealing vault...');
+      const res = await client.unseal({
+        key: process.env.VAULT_UNSEAL_KEY!
+      });
+
+      expect(res).to.have.property('sealed', false);
+
+      console.log(res);
     });
   });
 
