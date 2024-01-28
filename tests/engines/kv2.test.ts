@@ -2,7 +2,7 @@ import { Client } from '../../src';
 import { promisify } from '../utils';
 import 'dotenv/config';
 
-describe('node-vault', () => {
+describe('Key/Value Version 2 Secrets Engine', () => {
   const client = new Client({
     endpoint: process.env.VAULT_ENDPOINT_URL,
     token: process.env.VAULT_TOKEN

@@ -16,7 +16,7 @@ export type CommandInit<Schema extends RequestSchema> = {
   refine?: (init: RequestInit, args: CommandArgs<Schema>) => RequestInit;
 };
 
-export async function generateCommandRequestInit<Schema extends RequestSchema>(
+export async function generateRequestInit<Schema extends RequestSchema>(
   init: CommandInit<Schema>,
   args: CommandArgs<Schema>,
   options: Omit<RequestInit, 'url'>
@@ -68,27 +68,37 @@ export async function generateCommandRequestInit<Schema extends RequestSchema>(
     headers
   };
 
-  if (schema.body) {
-    // todo: throw error if body is set for GET/HEAD/OPTIONS
-    // if (['GET', 'HEAD', 'OPTIONS'].includes(method) && !(schema.body instanceof z.ZodAny)) {
-    //   throw new Error('Request with GET/HEAD/OPTIONS method cannot have body.');
-    // }
-    //
-    // if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
-    //   throw new Error('Request method must be POST/PUT/PATCH/DELETE.');
-    // }
-
-    if (schema.body instanceof z.ZodAny) {
-      requestInit.body = removeUndefined(omit(args, Object.keys(schema.searchParams?.shape || {})));
+  if (schema.body && schema.body instanceof z.ZodObject) {
+    if (['GET', 'HEAD', 'OPTIONS'].includes(method)) {
+      throw new Error('Request with GET/HEAD/OPTIONS method cannot have body.');
     }
 
-    if (schema.body instanceof z.ZodObject) {
-      const items = removeUndefined(pick(args || {}, Object.keys(schema.body.shape)));
-      if (!schema.body.safeParse(items).success) {
-        throw new Error('ErrorBody: Invalid Args.');
-      }
-      requestInit.body = items;
+    // if (schema.body instanceof z.ZodAny) {
+    //   requestInit.body = removeUndefined(omit(args, Object.keys(schema.searchParams?.shape || {})));
+    // }
+
+    // if (schema.body instanceof z.ZodObject) {
+    //   const items = removeUndefined(pick(args || {}, Object.keys(schema.body.shape)));
+    //   if (!schema.body.safeParse(items).success) {
+    //     throw new Error('ErrorBody: Invalid Args.');
+    //   }
+    //   requestInit.body = items;
+    // }
+
+    const items = removeUndefined(pick(args || {}, Object.keys(schema.body.shape)));
+    if (!schema.body.safeParse(items).success) {
+      throw new Error('ErrorBody: Invalid Args.');
     }
+    requestInit.body = items;
+  }
+
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method) && schema.body instanceof z.ZodAny) {
+    // Removes path and search params from body.
+    const keysToOmit = Object.keys(schema.searchParams?.shape || {}).concat(
+      Object.keys(schema.path?.shape || {})
+    );
+
+    requestInit.body = removeUndefined(omit(args, keysToOmit));
   }
 
   if (init.refine) {
@@ -102,7 +112,7 @@ export function generateCommand<Schema extends RequestSchema>(
   init: CommandInit<Schema>
 ): CommandFn<Schema> {
   return async (args, options = {}) => {
-    const requestInit = await generateCommandRequestInit(init, args || {}, options);
+    const requestInit = await generateRequestInit(init, args || {}, options);
     return request(requestInit, init.schema);
   };
 }

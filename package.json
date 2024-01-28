@@ -1,7 +1,6 @@
 {
   "name": "@litehex/node-vault",
   "version": "0.1.0-alpha.11",
-  "private": false,
   "description": "Node.js client for the HashiCorp's Vault API",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -22,10 +21,12 @@
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
-    "format:check": "prettier --plugin-search-dir . --check .",
-    "format:write": "prettier --plugin-search-dir . --write .",
-    "prepublishOnly": "npm run build"
+    "build": "tsup",
+    "test": "mocha **/*.test.ts",
+    "type-check": "tsc --noEmit",
+    "format:check": "prettier --check .",
+    "format:write": "prettier --write .",
+    "prepublishOnly": "pnpm test && pnpm run format:check && pnpm run type-check && pnpm build"
   },
   "packageManager": "pnpm@8.14.3",
   "dependencies": {

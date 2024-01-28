@@ -9,7 +9,7 @@ export async function request<Schema extends RequestSchema>(
   init: RequestInit,
   schema: Schema
 ): Promise<ValidatedResponse<Schema>> {
-  // todo: add support for searchParams
+  // todo: add support for searchParams, note searchParams are handled by generateRequestInit function for now
   // if (schema.searchParams) {
   //   const params = new URL(init.url).searchParams;
   //   const picked = pick(params, Object.keys(schema.searchParams.shape));
