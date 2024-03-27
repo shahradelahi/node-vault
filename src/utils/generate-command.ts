@@ -1,118 +1,85 @@
-import type { CommandArgs, CommandFn, RequestInit, RequestSchema } from '../typings';
-import { request } from '../lib/request';
-import { ClientOptions } from '../index';
-import { removeUndefined } from './object';
-import mustache from 'mustache';
+import { CommandFn, CommandInit, RequestSchema } from '@/typings';
 import pick from 'lodash.pick';
+import { generateRequest, ZodResponse } from 'zod-request';
 import omit from 'lodash.omit';
 import { z } from 'zod';
-import { URLSearchParams } from 'node:url';
-
-export type CommandInit<Schema extends RequestSchema> = {
-  method: RequestInit['method'];
-  path: string;
-  schema: Schema;
-  client: ClientOptions;
-  refine?: (init: RequestInit, args: CommandArgs<Schema>) => RequestInit;
-};
-
-export async function generateRequestInit<Schema extends RequestSchema>(
-  init: CommandInit<Schema>,
-  args: CommandArgs<Schema>,
-  options: Omit<RequestInit, 'url'>
-): Promise<RequestInit> {
-  const { method = 'GET', path, client, schema } = init;
-
-  if (schema.path) {
-    schema.path.parse(args);
-  }
-
-  const signedPath = mustache.render(path, args);
-  const url = new URL(
-    `${client.endpoint}/${client.apiVersion}${client.pathPrefix}${signedPath}`
-      // Replace unicode encodings.
-      .replace(/&#x2F;/g, '/')
-  );
-
-  const { headers: extraHeaders, ...restOpts } = options;
-
-  const headers = removeUndefined({
-    'X-Vault-Token': client.token,
-    'X-Vault-Namespace': client.namespace,
-    ...extraHeaders
-  }) as RequestInit['headers'];
-
-  if (schema.searchParams) {
-    const items = removeUndefined(pick(args || {}, Object.keys(schema.searchParams.shape)));
-    if (!schema.searchParams.safeParse(items).success) {
-      throw new Error('ErrorSearchPrams: Invalid Args.');
-    }
-
-    for (const [key, val] of Object.entries(items)) {
-      if (val === undefined || val === null) {
-        console.warn(`Search param "${key}" is undefined or empty. Skipping...`);
-        continue;
-      }
-      if (typeof val === 'boolean') {
-        url.searchParams.set(key, val ? '1' : '0');
-        continue;
-      }
-      url.searchParams.set(key, String(val));
-    }
-  }
-
-  let requestInit: RequestInit = {
-    ...restOpts,
-    method,
-    url: url.toString(),
-    headers
-  };
-
-  if (schema.body && schema.body instanceof z.ZodObject) {
-    if (['GET', 'HEAD', 'OPTIONS'].includes(method)) {
-      throw new Error('Request with GET/HEAD/OPTIONS method cannot have body.');
-    }
-
-    // if (schema.body instanceof z.ZodAny) {
-    //   requestInit.body = removeUndefined(omit(args, Object.keys(schema.searchParams?.shape || {})));
-    // }
-
-    // if (schema.body instanceof z.ZodObject) {
-    //   const items = removeUndefined(pick(args || {}, Object.keys(schema.body.shape)));
-    //   if (!schema.body.safeParse(items).success) {
-    //     throw new Error('ErrorBody: Invalid Args.');
-    //   }
-    //   requestInit.body = items;
-    // }
-
-    const items = removeUndefined(pick(args || {}, Object.keys(schema.body.shape)));
-    if (!schema.body.safeParse(items).success) {
-      throw new Error('ErrorBody: Invalid Args.');
-    }
-    requestInit.body = items;
-  }
-
-  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method) && schema.body instanceof z.ZodAny) {
-    // Removes path and search params from body.
-    const keysToOmit = Object.keys(schema.searchParams?.shape || {}).concat(
-      Object.keys(schema.path?.shape || {})
-    );
-
-    requestInit.body = removeUndefined(omit(args, keysToOmit));
-  }
-
-  if (init.refine) {
-    requestInit = init.refine(requestInit, args);
-  }
-
-  return requestInit;
-}
+import { removeUndefined } from './object';
+import { isJson } from './is-json';
 
 export function generateCommand<Schema extends RequestSchema>(
   init: CommandInit<Schema>
 ): CommandFn<Schema> {
   return async (args, options = {}) => {
-    const requestInit = await generateRequestInit(init, args || {}, options);
-    return request(requestInit, init.schema);
+    const { method = 'GET', path, client, schema } = init;
+
+    const { url: _url, input } = generateRequest<any, any>(
+      `${client.endpoint}/${client.apiVersion}${client.pathPrefix}${path}`,
+      {
+        method,
+        ...(options || {}),
+        path: !schema?.path ? undefined : pick(args || {}, Object.keys(schema.path.shape)),
+        params: !schema?.searchParams
+          ? undefined
+          : pick(args || {}, Object.keys(schema.searchParams.shape)),
+        body: !schema?.body
+          ? undefined
+          : schema.body instanceof z.ZodObject
+            ? pick(args || {}, Object.keys(schema.body.shape))
+            : (removeUndefined(
+                omit(
+                  args,
+                  // Potential Body Keys
+                  Object.keys(schema.searchParams?.shape || {})
+                    .concat(Object.keys(schema.path?.shape || {}))
+                    .concat(Object.keys(schema.headers?.shape || {}))
+                )
+              ) as any),
+        headers: {
+          'X-Vault-Token': client.token,
+          'X-Vault-Namespace': client.namespace,
+          ...(options.headers || {})
+        },
+        schema
+      }
+    );
+
+    const fetcher = init.fetcher || client.fetcher || globalThis.fetch;
+
+    const url = _url
+      .toString()
+      // Replace unicode encodings.
+      .replace(/&#x2F;/g, '/');
+    const refinedInput = init.refine ? init.refine(input, args as any) : input;
+
+    // Convert body to json if it's not already
+    if (refinedInput.body && !isJson(refinedInput.body)) {
+      refinedInput.body = JSON.stringify(refinedInput.body);
+    }
+
+    const response = await fetcher(url, refinedInput);
+
+    if (!schema.response || schema.response instanceof z.ZodAny) {
+      if (
+        response.headers.has('content-length') &&
+        response.headers.get('content-length') !== '0'
+      ) {
+        if (
+          response.headers.has('content-type') &&
+          response.headers.get('content-type')?.includes('application/json')
+        ) {
+          return response.json();
+        }
+
+        return response.text();
+      }
+
+      return response.ok;
+    }
+
+    if (!options.strictSchema) {
+      return response.json();
+    }
+
+    return new ZodResponse(response, schema.response).json();
   };
 }

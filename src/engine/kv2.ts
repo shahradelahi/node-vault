@@ -1,4 +1,4 @@
-import { ClientOptions, generateCommand } from '../index';
+import { ClientOptions, generateCommand } from '@/index';
 import { z } from 'zod';
 
 export const kv2 = (opts: ClientOptions) => ({

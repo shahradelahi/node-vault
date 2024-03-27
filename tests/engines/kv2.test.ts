@@ -1,6 +1,5 @@
-import { Client } from '../../src';
-import { promisify } from '../utils';
-import 'dotenv/config';
+import { Client } from '@litehex/node-vault';
+import { promisify } from '@tests/utils';
 
 describe('Key/Value Version 2 Secrets Engine', () => {
   const client = new Client({

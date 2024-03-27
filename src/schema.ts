@@ -7,3 +7,11 @@ export const AuthSchema = z.object({
   lease_duration: z.number(),
   renewable: z.boolean()
 });
+
+export const ClientOptionsSchema = z.object({
+  endpoint: z.string().optional(),
+  apiVersion: z.string().optional(),
+  pathPrefix: z.string().optional(),
+  token: z.string().optional(),
+  namespace: z.string().optional()
+});

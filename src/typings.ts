@@ -1,29 +1,32 @@
-import { RequestInit as Init } from 'undici';
-import { z } from 'zod';
-import { JsonObject } from 'type-fest';
+import type { z } from 'zod';
+import { JsonObject, PartialDeep } from 'type-fest';
+import type { RequestInit, RequestSchema as ZodRequestSchema } from 'zod-request';
+import { ClientOptionsSchema } from '@/schema';
 
-export interface RequestInit extends Omit<Init, 'body'> {
-  url: string;
-  strictSchema?: boolean;
-  body?: Record<string, unknown>;
-}
+export type ClientOptions = z.infer<typeof ClientOptionsSchema> & {
+  request?: PartialDeep<globalThis.RequestInit>;
+  fetcher?: Fetcher;
+};
 
-export interface RequestSchema {
+export type RequestSchema = Omit<ZodRequestSchema, 'path' | 'body'> & {
   path?: z.ZodObject<any>;
-  searchParams?: z.ZodObject<any>;
   body?: z.ZodObject<any> | z.ZodAny;
-  response?: z.ZodObject<any> | z.ZodRecord<any> | z.ZodDiscriminatedUnion<any, any> | z.ZodAny;
-}
+};
 
-export type ValidatedResponse<T extends RequestSchema> = T['response'] extends z.ZodAny
-  ? any
-  : T['response'] extends z.ZodRecord<any>
-    ? JsonObject
-    : T['response'] extends z.ZodObject<any>
-      ? z.infer<T['response']>
-      : T['response'] extends z.ZodDiscriminatedUnion<any, any>
-        ? z.infer<T['response']>
-        : unknown;
+export type Fetcher = (init: globalThis.RequestInit) => Promise<globalThis.Response>;
+
+export type ExtendedRequestInit = RequestInit & {
+  strictSchema?: boolean;
+};
+
+export type CommandInit<Schema extends RequestSchema> = {
+  method: RequestInit['method'];
+  path: string;
+  schema: Schema;
+  client: ClientOptions;
+  refine?: (init: globalThis.RequestInit, args: CommandArgs<Schema>) => globalThis.RequestInit;
+  fetcher?: Fetcher;
+};
 
 export type CommandArgs<Schema extends RequestSchema> =
   (Schema['searchParams'] extends z.ZodObject<any> ? z.infer<Schema['searchParams']> : {}) &
@@ -38,5 +41,5 @@ export type CommandArgs<Schema extends RequestSchema> =
 
 export type CommandFn<Schema extends RequestSchema> = (
   args?: CommandArgs<Schema>,
-  options?: Omit<RequestInit, 'url'>
-) => Promise<ValidatedResponse<Schema>>;
+  options?: Omit<ExtendedRequestInit, 'url'>
+) => Promise<Schema['response'] extends z.ZodType ? z.infer<Schema['response']> : unknown>;
