@@ -20,7 +20,7 @@ describe('node-vault', () => {
     });
 
     const result = await fooCommand();
-    console.log(result);
+    expect(result).to.have.property('sealed').be.a('boolean');
   });
 
   it('should get seal status', async () => {
@@ -41,20 +41,17 @@ describe('node-vault', () => {
   it('should seal and unseal vault', async () => {
     const result = await client.status();
     if (!result.sealed) {
-      console.log('Sealing vault...');
       await client.seal();
     }
 
     // Wait 5 seconds to ensure vault is sealed
     await sleep(5000);
 
-    console.log('Unsealing vault...');
     const res = await client.unseal({
       key: process.env.VAULT_UNSEAL_KEY!
     });
 
     expect(res).to.have.property('sealed', false);
-    console.log('Done');
   });
 
   it('should write, read and delete secret', async () => {

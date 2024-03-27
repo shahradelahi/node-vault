@@ -1,5 +1,5 @@
 import { PartialDeep } from 'type-fest';
-import { ClientOptionsSchema } from '@/schema';
+import { ApiResponseSchema, ClientOptionsSchema, EngineInfoSchema, ErrorSchema } from '@/schema';
 import { generateCommand } from '@litehex/node-vault';
 import { z } from 'zod';
 import { kv2 } from '@/engine/kv2';
@@ -51,7 +51,7 @@ class Client {
       path: z.object({
         path: z.string()
       }),
-      response: z.any()
+      response: z.union([ErrorSchema, z.record(z.any())])
     }
   });
 
@@ -64,7 +64,7 @@ class Client {
         path: z.string()
       }),
       body: z.any(),
-      response: z.any()
+      response: ApiResponseSchema
     }
   });
 
@@ -80,6 +80,8 @@ class Client {
   });
 
   /**
+   * Seal status
+   *
    * @link https://developer.hashicorp.com/vault/api-docs/system/seal-status#seal-status
    */
   status = generateCommand({
@@ -105,6 +107,8 @@ class Client {
   });
 
   /**
+   * Read initialization status
+   *
    * @link https://developer.hashicorp.com/vault/api-docs/system/init#read-initialization-status
    */
   initialized = generateCommand({
@@ -119,6 +123,8 @@ class Client {
   });
 
   /**
+   * Start initialization
+   *
    * @link https://developer.hashicorp.com/vault/api-docs/system/init#start-initialization
    */
   init = generateCommand({
@@ -145,6 +151,8 @@ class Client {
   });
 
   /**
+   * Submit unseal key
+   *
    * @link https://developer.hashicorp.com/vault/api-docs/system/unseal#submit-unseal-key
    */
   unseal = generateCommand({
@@ -179,6 +187,8 @@ class Client {
   });
 
   /**
+   * Seal
+   *
    * @link https://developer.hashicorp.com/vault/api-docs/system/seal#seal
    */
   seal = generateCommand({
@@ -186,11 +196,13 @@ class Client {
     path: '/sys/seal',
     client: this,
     schema: {
-      response: z.record(z.any())
+      response: z.union([ErrorSchema, z.record(z.any())])
     }
   });
 
   /**
+   * Read root generation progress
+   *
    * @link https://developer.hashicorp.com/vault/api-docs/system/generate-root#read-root-generation-progress
    */
   getRootGenerationProgress = generateCommand({
@@ -212,6 +224,8 @@ class Client {
   });
 
   /**
+   * Start root token generation
+   *
    * @link https://developer.hashicorp.com/vault/api-docs/system/generate-root#start-root-token-generation
    */
   startRootGeneration = generateCommand({
@@ -236,6 +250,8 @@ class Client {
   });
 
   /**
+   * Cancel root generation
+   *
    * @link https://developer.hashicorp.com/vault/api-docs/system/generate-root#cancel-root-generation
    */
   cancelRootGeneration = generateCommand({
@@ -248,6 +264,8 @@ class Client {
   });
 
   /**
+   * Provide key share to generate root
+   *
    * @link https://developer.hashicorp.com/vault/api-docs/system/generate-root#provide-key-share-to-generate-root
    */
   provideKeyShare = generateCommand({
@@ -268,6 +286,134 @@ class Client {
         complete: z.boolean(),
         encoded_token: z.string()
       })
+    }
+  });
+
+  /**
+   * List mounted secrets engines
+   *
+   * @link https://developer.hashicorp.com/vault/api-docs/system/mounts#list-mounted-secrets-engines
+   */
+  mounts = generateCommand({
+    method: 'GET',
+    path: '/sys/mounts',
+    client: this,
+    schema: {
+      response: z.object({
+        request_id: z.string(),
+        lease_id: z.string(),
+        lease_duration: z.number(),
+        renewable: z.boolean(),
+        data: z.record(EngineInfoSchema),
+        warnings: z.array(z.string()).nullable()
+      })
+    }
+  });
+
+  /**
+   * Enable secrets engine
+   *
+   * @link https://developer.hashicorp.com/vault/api-docs/system/mounts#enable-secrets-engine
+   */
+  mount = generateCommand({
+    method: 'POST',
+    path: '/sys/mounts/{{mountPath}}',
+    client: this,
+    schema: {
+      path: z.object({
+        mountPath: z.string()
+      }),
+      body: z.object({
+        type: z.string(),
+        description: z.string().optional(),
+        config: z.record(z.string()).optional()
+      })
+    }
+  });
+
+  /**
+   * Disable secrets engine
+   *
+   * @link https://developer.hashicorp.com/vault/api-docs/system/mounts#disable-secrets-engine
+   */
+  unmount = generateCommand({
+    method: 'DELETE',
+    path: '/sys/mounts/{{mountPath}}',
+    client: this,
+    schema: {
+      path: z.object({
+        mountPath: z.string()
+      })
+    }
+  });
+
+  /**
+   * Get the configuration of a secret engine
+   *
+   * @link https://developer.hashicorp.com/vault/api-docs/system/mounts#get-the-configuration-of-a-secret-engine
+   */
+  getMountInfo = generateCommand({
+    method: 'GET',
+    path: '/sys/mounts/{{mountPath}}',
+    client: this,
+    schema: {
+      path: z.object({
+        mountPath: z.string()
+      }),
+      response: ApiResponseSchema
+    }
+  });
+
+  /**
+   * Read mount configuration
+   *
+   * @link https://developer.hashicorp.com/vault/api-docs/system/mounts#read-mount-configuration
+   */
+  readMount = generateCommand({
+    method: 'GET',
+    path: '/sys/mounts/{{mountPath}}/tune',
+    client: this,
+    schema: {
+      path: z.object({
+        mountPath: z.string()
+      }),
+      response: z.union([
+        ErrorSchema,
+        z.object({
+          default_lease_ttl: z.number(),
+          max_lease_ttl: z.number(),
+          force_no_cache: z.boolean()
+        })
+      ])
+    }
+  });
+
+  /**
+   * Tune mount configuration
+   *
+   * @link https://developer.hashicorp.com/vault/api-docs/system/mounts#tune-mount-configuration
+   */
+  tuneMount = generateCommand({
+    method: 'POST',
+    path: '/sys/mounts/{{mountPath}}/tune',
+    client: this,
+    schema: {
+      path: z.object({
+        mountPath: z.string()
+      }),
+      body: z.object({
+        default_lease_ttl: z.number().optional(),
+        max_lease_ttl: z.number().optional(),
+        description: z.string().optional(),
+        audit_non_hmac_request_keys: z.array(z.string()).optional(),
+        audit_non_hmac_response_keys: z.array(z.string()).optional(),
+        listing_visibility: z.string().optional(),
+        passthrough_request_headers: z.array(z.string()).optional(),
+        allowed_response_headers: z.array(z.string()).optional(),
+        allowed_managed_keys: z.array(z.string()).optional(),
+        plugin_version: z.string().optional()
+      }),
+      response: ApiResponseSchema
     }
   });
 }

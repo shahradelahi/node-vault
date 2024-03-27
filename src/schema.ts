@@ -8,6 +8,27 @@ export const AuthSchema = z.object({
   renewable: z.boolean()
 });
 
+export const EngineInfoSchema = z.object({
+  accessor: z.string(),
+  config: z.record(z.any()).nullable(),
+  description: z.string(),
+  external_entropy_access: z.boolean(),
+  local: z.boolean(),
+  options: z.record(z.any()).nullable(),
+  plugin_version: z.string(),
+  running_plugin_version: z.string(),
+  running_sha256: z.string(),
+  seal_wrap: z.boolean(),
+  type: z.string(),
+  uuid: z.string()
+});
+
+export const ErrorSchema = z.object({
+  errors: z.array(z.string())
+});
+
+export const ApiResponseSchema = z.union([ErrorSchema, z.record(z.any())]);
+
 export const ClientOptionsSchema = z.object({
   endpoint: z.string().optional(),
   apiVersion: z.string().optional(),
