@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-types */
+
 import type { z } from 'zod';
 import { JsonObject, PartialDeep } from 'type-fest';
 import type { RequestInit, RequestSchema as ZodRequestSchema } from 'zod-request';
@@ -29,15 +31,20 @@ export type CommandInit<Schema extends RequestSchema> = {
 };
 
 export type CommandArgs<Schema extends RequestSchema> =
+// Path Schema
+  (Schema['path'] extends z.ZodObject<any> ? z.infer<Schema['path']> : {}) &
+  // SearchParams Schema
   (Schema['searchParams'] extends z.ZodObject<any> ? z.infer<Schema['searchParams']> : {}) &
-    (Schema['body'] extends z.ZodDiscriminatedUnion<any, any>
-      ? z.infer<Schema['body']>
-      : Schema['body'] extends z.ZodAny
-        ? JsonObject
-        : Schema['body'] extends z.ZodObject<any>
-          ? z.infer<Schema['body']>
-          : {}) &
-    (Schema['path'] extends z.ZodObject<any> ? z.infer<Schema['path']> : {});
+  // Headers Schema
+  (Schema['headers'] extends z.ZodObject<any> ? z.infer<Schema['headers']> : {}) &
+  // Body Schema
+  (Schema['body'] extends z.ZodDiscriminatedUnion<any, any>
+    ? z.infer<Schema['body']>
+    : Schema['body'] extends z.ZodAny
+      ? JsonObject
+      : Schema['body'] extends z.ZodObject<any>
+        ? z.infer<Schema['body']>
+        : {});
 
 export type CommandFn<Schema extends RequestSchema> = (
   args?: CommandArgs<Schema>,
