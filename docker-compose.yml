@@ -1,0 +1,13 @@
+version: '3'
+services:
+  vault:
+    container_name: vault
+    image: vault:1.13.3
+    volumes:
+      - ${PWD}/examples/config.hcl:/vault/config/vault.hcl
+    ports:
+      - '8200:8200'
+      - '8201:8201'
+    cap_add:
+      - IPC_LOCK
+    entrypoint: vault server -config=/vault/config/vault.hcl
