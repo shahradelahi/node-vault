@@ -3,7 +3,7 @@
 > A modern JavaScript client for HashiCorp's Vault with a focus on ease-of-use.
 
 [![Build status](https://github.com/shahradelahi/node-vault/actions/workflows/ci.yml/badge.svg)](https://github.com/shahradelahi/node-vault/actions/workflows/ci.yml)
-[![Dependency Status](https://img.shields.io/librariesio/release/npm/@litehex/node-vault.svg)](https://libraries.io/npm/@litehex/node-vault/)
+[![Dependency Status](https://img.shields.io/librariesio/release/npm/@litehex%2Fnode-vault.svg)](https://libraries.io/npm/@litehex%2Fnode-vault/)
 [![npm](https://img.shields.io/npm/v/@litehex/node-vault)](https://www.npmjs.com/package/@litehex/node-vault)
 [![install size](https://packagephobia.com/badge?p=@litehex/node-vault)](https://packagephobia.com/result?p=@litehex/node-vault)
 
