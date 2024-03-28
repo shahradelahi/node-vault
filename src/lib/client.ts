@@ -4,6 +4,7 @@ import { generateCommand } from '@litehex/node-vault';
 import { z } from 'zod';
 import { kv2 } from '@/engine/kv2';
 import { ClientOptions } from '@/typings';
+import type { RequestInit } from 'undici';
 
 class Client {
   endpoint: string;

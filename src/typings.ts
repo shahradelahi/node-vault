@@ -2,11 +2,12 @@
 
 import type { z } from 'zod';
 import { JsonObject, PartialDeep } from 'type-fest';
-import type { RequestInit, RequestSchema as ZodRequestSchema } from 'zod-request';
+import type { ZodRequestInit, RequestSchema as ZodRequestSchema } from 'zod-request';
+import type { RequestInit } from 'undici';
 import { ClientOptionsSchema } from '@/schema';
 
 export type ClientOptions = z.infer<typeof ClientOptionsSchema> & {
-  request?: PartialDeep<globalThis.RequestInit>;
+  request?: PartialDeep<RequestInit>;
   fetcher?: Fetcher;
 };
 
@@ -15,13 +16,13 @@ export type RequestSchema = Omit<ZodRequestSchema, 'path' | 'body'> & {
   body?: z.ZodObject<any> | z.ZodAny;
 };
 
-export type Fetcher = (init: globalThis.RequestInit) => Promise<globalThis.Response>;
+export type Fetcher = (input: any, init: any) => Promise<any>;
 
-export type ExtendedRequestInit = RequestInit & {
+export type ExtendedRequestInit = ZodRequestInit<any, any> & {
   strictSchema?: boolean;
 };
 
-type RequestInitWithURL = globalThis.RequestInit & {
+type RequestInitWithURL = RequestInit & {
   url: URL;
 };
 

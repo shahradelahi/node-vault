@@ -1,6 +1,7 @@
 import { CommandFn, CommandInit, RequestSchema } from '@/typings';
 import omit from 'lodash.omit';
 import pick from 'lodash.pick';
+import { fetch, type RequestInit } from 'undici';
 import { z } from 'zod';
 import { generateRequest, ZodResponse } from 'zod-request';
 import { isJson } from './is-json';
@@ -48,9 +49,9 @@ export function generateCommand<Schema extends RequestSchema>(
       }
     );
 
-    const fetcher = init.fetcher || client.fetcher || globalThis.fetch;
+    const fetcher = init.fetcher || client.fetcher || fetch;
 
-    const rawInit = Object.assign(input, {
+    const rawInit = Object.assign(input as RequestInit, {
       url: new URL(
         _url
           .toString()
