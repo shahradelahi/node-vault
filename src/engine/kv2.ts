@@ -1,8 +1,13 @@
 import { ClientOptions, generateCommand } from '@/index';
 import { z } from 'zod';
+import { ApiSuccessResponseSchema, ErrorSchema } from '@/schema';
 
 export const kv2 = (opts: ClientOptions) => ({
-  // https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#configure-the-kv-engine
+  /**
+   * Configure the KV engine
+   *
+   * @link https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#configure-the-kv-engine
+   */
   config: generateCommand({
     method: 'POST',
     path: '/{{mountPath}}/config',
@@ -15,10 +20,16 @@ export const kv2 = (opts: ClientOptions) => ({
         max_versions: z.number().optional(),
         cas_required: z.boolean().optional(),
         delete_version_after: z.string().optional()
-      })
+      }),
+      response: z.union([ErrorSchema, z.boolean()])
     }
   }),
-  // https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#read-kv-engine-configuration
+
+  /**
+   * Read KV engine configuration
+   *
+   * @link https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#read-kv-engine-configuration
+   */
   readConfig: generateCommand({
     method: 'GET',
     path: '/{{mountPath}}/config',
@@ -27,16 +38,24 @@ export const kv2 = (opts: ClientOptions) => ({
       path: z.object({
         mountPath: z.string()
       }),
-      response: z.object({
-        data: z.object({
-          cas_required: z.boolean(),
-          delete_version_after: z.string(),
-          max_versions: z.number()
+      response: z.union([
+        ErrorSchema,
+        ApiSuccessResponseSchema.extend({
+          data: z.object({
+            cas_required: z.boolean(),
+            delete_version_after: z.string(),
+            max_versions: z.number()
+          })
         })
-      })
+      ])
     }
   }),
-  // https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#read-secret-version
+
+  /**
+   * Read secret version
+   *
+   * @link https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#read-secret-version
+   */
   read: generateCommand({
     method: 'GET',
     path: '/{{mountPath}}/data/{{path}}',
@@ -49,15 +68,23 @@ export const kv2 = (opts: ClientOptions) => ({
       searchParams: z.object({
         version: z.number().default(0).optional()
       }),
-      response: z.object({
-        data: z.object({
-          data: z.record(z.string()),
-          metadata: MetadataSchema
+      response: z.union([
+        ErrorSchema,
+        ApiSuccessResponseSchema.extend({
+          data: z.object({
+            data: z.record(z.string()),
+            metadata: MetadataSchema
+          })
         })
-      })
+      ])
     }
   }),
-  // https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#create-update-secret
+
+  /**
+   * Create/Update secret
+   *
+   * @link https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#create-update-secret
+   */
   write: generateCommand({
     method: 'POST',
     path: '/{{mountPath}}/data/{{path}}',
@@ -71,16 +98,30 @@ export const kv2 = (opts: ClientOptions) => ({
         data: z.record(z.any()).default({}),
         options: PostOptionsSchema.default({}).optional()
       }),
-      response: z.object({
-        data: MetadataSchema
-      })
+      response: z.union([
+        ErrorSchema,
+        ApiSuccessResponseSchema.extend({
+          data: MetadataSchema
+        })
+      ])
     }
   }),
-  // https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#patch-secret
+
+  /**
+   * Patch secret
+   *
+   * @link https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#patch-secret
+   */
   patch: generateCommand({
     method: 'PATCH',
     path: '/{{mountPath}}/data/{{path}}',
     client: opts,
+    refine: (init) => {
+      init.headers = Object.assign(init.headers || {}, {
+        'Content-Type': 'application/merge-patch+json'
+      });
+      return init;
+    },
     schema: {
       path: z.object({
         mountPath: z.string(),
@@ -95,10 +136,15 @@ export const kv2 = (opts: ClientOptions) => ({
       })
     }
   }),
-  // https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#read-secret-subkeys
+
+  /**
+   * Read secret subkeys
+   *
+   * @link https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#read-secret-subkeys
+   */
   subKeys: generateCommand({
     method: 'GET',
-    path: '/{{mountPath}}/metadata/{{path}}',
+    path: '/{{mountPath}}/subkeys/{{path}}',
     client: opts,
     schema: {
       path: z.object({
@@ -109,13 +155,23 @@ export const kv2 = (opts: ClientOptions) => ({
         version: z.number().optional(),
         depth: z.number().optional()
       }),
-      response: z.object({
-        subkeys: z.any(),
-        metadata: MetadataSchema
-      })
+      response: z.union([
+        ErrorSchema,
+        ApiSuccessResponseSchema.extend({
+          data: z.object({
+            metadata: MetadataSchema,
+            subkeys: z.record(z.any())
+          })
+        })
+      ])
     }
   }),
-  // https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#delete-latest-version-of-secret
+
+  /**
+   * Delete latest version of secret
+   *
+   * @link https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#delete-latest-version-of-secret
+   */
   deleteLatestVersion: generateCommand({
     method: 'DELETE',
     path: '/{{mountPath}}/data/{{path}}',
@@ -124,10 +180,16 @@ export const kv2 = (opts: ClientOptions) => ({
       path: z.object({
         mountPath: z.string(),
         path: z.string()
-      })
+      }),
+      response: z.union([ErrorSchema, z.boolean()])
     }
   }),
-  // https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#delete-secret-versions
+
+  /**
+   * Delete secret versions
+   *
+   * @link https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#delete-secret-versions
+   */
   delete: generateCommand({
     method: 'POST',
     path: '/{{mountPath}}/delete/{{path}}',
@@ -139,10 +201,16 @@ export const kv2 = (opts: ClientOptions) => ({
       }),
       body: z.object({
         versions: z.array(z.number())
-      })
+      }),
+      response: z.union([ErrorSchema, z.boolean()])
     }
   }),
-  // https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#undelete-secret-versions
+
+  /**
+   * Undelete secret versions
+   *
+   * @link https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#undelete-secret-versions
+   */
   undelete: generateCommand({
     method: 'POST',
     path: '/{{mountPath}}/undelete/{{path}}',
@@ -154,10 +222,16 @@ export const kv2 = (opts: ClientOptions) => ({
       }),
       body: z.object({
         versions: z.array(z.number())
-      })
+      }),
+      response: z.union([ErrorSchema, z.boolean()])
     }
   }),
-  // https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#destroy-secret-versions
+
+  /**
+   * Destroy secret versions
+   *
+   * @link https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#destroy-secret-versions
+   */
   destroy: generateCommand({
     method: 'POST',
     path: '/{{mountPath}}/destroy/{{path}}',
@@ -169,10 +243,16 @@ export const kv2 = (opts: ClientOptions) => ({
       }),
       body: z.object({
         versions: z.array(z.number())
-      })
+      }),
+      response: z.union([ErrorSchema, z.boolean()])
     }
   }),
-  // https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#list-secrets
+
+  /**
+   * List secrets
+   *
+   * @link https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#list-secrets
+   */
   list: generateCommand({
     method: 'LIST',
     path: '/{{mountPath}}/metadata/{{path}}',
@@ -182,12 +262,22 @@ export const kv2 = (opts: ClientOptions) => ({
         mountPath: z.string(),
         path: z.string()
       }),
-      response: z.object({
-        keys: z.array(z.string())
-      })
+      response: z.union([
+        ErrorSchema,
+        ApiSuccessResponseSchema.extend({
+          data: z.object({
+            keys: z.array(z.string())
+          })
+        })
+      ])
     }
   }),
-  // https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#read-secret-metadata
+
+  /**
+   * Read secret metadata
+   *
+   * @link https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#read-secret-metadata
+   */
   readMetadata: generateCommand({
     method: 'GET',
     path: '/{{mountPath}}/metadata/{{path}}',
@@ -197,28 +287,36 @@ export const kv2 = (opts: ClientOptions) => ({
         mountPath: z.string(),
         path: z.string()
       }),
-      response: z.object({
-        data: z.object({
-          cas_required: z.boolean(),
-          created_time: z.string(),
-          current_version: z.number(),
-          delete_version_after: z.string(),
-          max_versions: z.number(),
-          oldest_version: z.number(),
-          updated_time: z.string(),
-          custom_metadata: z.any().nullable(),
-          versions: z.record(
-            z.object({
-              created_time: z.string(),
-              deletion_time: z.string(),
-              destroyed: z.boolean()
-            })
-          )
+      response: z.union([
+        ErrorSchema,
+        ApiSuccessResponseSchema.extend({
+          data: z.object({
+            cas_required: z.boolean(),
+            created_time: z.string(),
+            current_version: z.number(),
+            custom_metadata: z.record(z.string()).nullable(),
+            delete_version_after: z.string(),
+            max_versions: z.number(),
+            oldest_version: z.number(),
+            updated_time: z.string(),
+            versions: z.record(
+              z.object({
+                created_time: z.string(),
+                deletion_time: z.string(),
+                destroyed: z.boolean()
+              })
+            )
+          })
         })
-      })
+      ])
     }
   }),
-  // https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#create-update-metadata
+
+  /**
+   * Create/Update metadata
+   *
+   * @link https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#create-update-metadata
+   */
   writeMetadata: generateCommand({
     method: 'POST',
     path: '/{{mountPath}}/metadata/{{path}}',
@@ -228,19 +326,24 @@ export const kv2 = (opts: ClientOptions) => ({
         mountPath: z.string(),
         path: z.string()
       }),
-      body: MetadataRequestBodySchema
+      body: MetadataRequestBodySchema,
+      response: z.union([ErrorSchema, z.boolean()])
     }
   }),
-  // https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#patch-metadata
+
+  /**
+   * Patch metadata
+   *
+   * @link https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#patch-metadata
+   */
   patchMetadata: generateCommand({
     method: 'PATCH',
     path: '/{{mountPath}}/metadata/{{path}}',
     client: opts,
     refine: (init) => {
-      init.headers = {
-        ...init.headers,
+      init.headers = Object.assign(init.headers || {}, {
         'Content-Type': 'application/merge-patch+json'
-      };
+      });
       return init;
     },
     schema: {
@@ -249,10 +352,15 @@ export const kv2 = (opts: ClientOptions) => ({
         path: z.string()
       }),
       body: MetadataRequestBodySchema,
-      response: z.any()
+      response: z.union([ErrorSchema, z.boolean()])
     }
   }),
-  // https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#delete-metadata-and-all-versions
+
+  /**
+   * Delete metadata and all versions
+   *
+   * @link https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#delete-metadata-and-all-versions
+   */
   deleteMetadata: generateCommand({
     method: 'DELETE',
     path: '/{{mountPath}}/metadata/{{path}}',
@@ -261,14 +369,15 @@ export const kv2 = (opts: ClientOptions) => ({
       path: z.object({
         mountPath: z.string(),
         path: z.string()
-      })
+      }),
+      response: z.union([ErrorSchema, z.boolean()])
     }
   })
 });
 
 const MetadataSchema = z.object({
   created_time: z.string(),
-  custom_metadata: z.any().nullable(),
+  custom_metadata: z.record(z.string()).nullable(),
   deletion_time: z.string(),
   destroyed: z.boolean(),
   version: z.number()

@@ -1,22 +1,23 @@
 import { CommandFn, CommandInit, RequestSchema } from '@/typings';
-import pick from 'lodash.pick';
-import { generateRequest, ZodResponse } from 'zod-request';
 import omit from 'lodash.omit';
+import pick from 'lodash.pick';
 import { z } from 'zod';
-import { removeUndefined } from './object';
+import { generateRequest, ZodResponse } from 'zod-request';
 import { isJson } from './is-json';
+import { removeUndefined } from './object';
 
 export function generateCommand<Schema extends RequestSchema>(
   init: CommandInit<Schema>
 ): CommandFn<Schema> {
   return async (args, options = {}) => {
     const { method = 'GET', path, client, schema } = init;
+    const { strictSchema = true, ...opts } = options;
 
     const { url: _url, input } = generateRequest<any, any>(
       `${client.endpoint}/${client.apiVersion}${client.pathPrefix}${path}`,
       {
         method,
-        ...(options || {}),
+        ...opts,
         path: !schema?.path ? undefined : pick(args || {}, Object.keys(schema.path.shape)),
         params: !schema?.searchParams
           ? undefined
@@ -34,22 +35,31 @@ export function generateCommand<Schema extends RequestSchema>(
                     .concat(Object.keys(schema.headers?.shape || {}))
                 )
               ) as any),
-        headers: {
-          'X-Vault-Token': client.token,
-          'X-Vault-Namespace': client.namespace,
-          ...(options.headers || {})
-        },
+        headers: removeUndefined(
+          Object.assign(
+            {
+              'X-Vault-Token': client.token,
+              'X-Vault-Namespace': client.namespace
+            },
+            opts.headers || {}
+          )
+        ),
         schema
       }
     );
 
     const fetcher = init.fetcher || client.fetcher || globalThis.fetch;
 
-    const url = _url
-      .toString()
-      // Replace unicode encodings.
-      .replace(/&#x2F;/g, '/');
-    const refinedInput = init.refine ? init.refine(input, args as any) : input;
+    const rawInit = Object.assign(input, {
+      url: new URL(
+        _url
+          .toString()
+          // Replace unicode encodings.
+          .replace(/&#x2F;/g, '/')
+      )
+    });
+
+    const { url, ...refinedInput } = init.refine ? init.refine(rawInit, args as any) : rawInit;
 
     // Convert body to json if it's not already
     if (refinedInput.body && !isJson(refinedInput.body)) {
@@ -57,29 +67,38 @@ export function generateCommand<Schema extends RequestSchema>(
     }
 
     const response = await fetcher(url, refinedInput);
+    const { headers } = response;
 
-    if (!schema.response || schema.response instanceof z.ZodAny) {
-      if (
-        response.headers.has('content-length') &&
-        response.headers.get('content-length') !== '0'
-      ) {
-        if (
-          response.headers.has('content-type') &&
-          response.headers.get('content-type')?.includes('application/json')
-        ) {
-          return response.json();
-        }
-
-        return response.text();
-      }
-
+    const hasContent = headers.has('content-length') && headers.get('content-length') !== '0';
+    if (!hasContent) {
       return response.ok;
     }
 
-    if (!options.strictSchema) {
-      return response.json();
+    const hasJsonContentType =
+      headers.has('content-type') && headers.get('content-type') === 'application/json';
+
+    if (!strictSchema || !schema.response || schema.response instanceof z.ZodAny) {
+      if (hasJsonContentType) {
+        return response.json();
+      }
+
+      return parseText(await response.text());
     }
 
-    return new ZodResponse(response, schema.response).json();
+    const zr = new ZodResponse(response, schema.response);
+
+    if (hasJsonContentType) {
+      return zr.json();
+    }
+
+    return parseText(await zr.text());
   };
+}
+
+function parseText(text: string): object | string {
+  const json = isJson(text);
+  if (json) {
+    return json;
+  }
+  return text;
 }

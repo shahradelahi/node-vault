@@ -76,7 +76,7 @@ const deleted = await vc.delete({ path: 'my-secret/data/hello' });
 console.log(deleted); // true
 ```
 
-Check out the [examples directory](/examples) for more examples.
+Check out the [examples](/examples) and [tests](/tests) directory for more examples.
 
 ### Documentation
 

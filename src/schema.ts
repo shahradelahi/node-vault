@@ -27,6 +27,16 @@ export const ErrorSchema = z.object({
   errors: z.array(z.string())
 });
 
+export const ApiSuccessResponseSchema = z.object({
+  request_id: z.string(),
+  lease_id: z.string(),
+  renewable: z.boolean(),
+  lease_duration: z.number(),
+  wrap_info: z.record(z.any()).nullable(),
+  warnings: z.record(z.any()).nullable(),
+  auth: z.record(z.any()).nullable()
+});
+
 export const ApiResponseSchema = z.union([ErrorSchema, z.record(z.any())]);
 
 export const ClientOptionsSchema = z.object({

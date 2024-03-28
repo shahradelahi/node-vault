@@ -1,102 +1,272 @@
 import { Client } from '@litehex/node-vault';
-import { promisify } from '@tests/utils';
+import { createInstance, destroyInstance, sleep } from '@tests/utils';
+import { expect } from 'chai';
 
 describe('Key/Value Version 2 Secrets Engine', () => {
-  const client = new Client({
-    endpoint: process.env.VAULT_ENDPOINT_URL,
-    token: process.env.VAULT_TOKEN
+  const vc = new Client();
+  const kv2 = vc.kv2();
+
+  const mountPath = 'my-secret';
+
+  const createEngine = async () => {
+    const { errors } = await vc.getMountInfo({
+      mountPath
+    });
+
+    if (!errors) {
+      await vc.unmount({ mountPath });
+    }
+
+    await sleep(1e3);
+
+    await vc.mount({ mountPath, type: 'kv-v2' });
+  };
+
+  // Launch
+  before(async () => {
+    const { root_token } = await createInstance();
+    vc.token = root_token;
   });
 
-  const kv2 = client.kv2();
+  // Down
+  after(async () => {
+    destroyInstance();
+    await sleep(2e3);
+  });
 
-  it('should create a secret path and write a new version', () => {
-    return promisify(async () => {
-      const createResult = await kv2.write({
-        mountPath: 'secret',
+  it('should mount the secrets engine', async () => {
+    // Create
+    {
+      const result = await vc.mount({
+        mountPath,
+        type: 'kv-v2'
+      });
+
+      expect(result).to.true;
+    }
+
+    // Verify
+    {
+      const result = await vc.getMountInfo({
+        mountPath
+      });
+
+      expect(result).to.have.property('type', 'kv');
+      expect(result).to.have.property('options').to.have.property('version', '2');
+    }
+  });
+
+  it('should create a secret path and write a new version', async () => {
+    await createEngine();
+
+    // Write
+    {
+      const result = await kv2.write({
+        mountPath,
         path: 'new-test',
         data: {
           foo: 'bar'
         }
       });
-      console.log('created', createResult);
-      const writeNew = await kv2.write({
-        mountPath: 'secret',
+
+      expect(result).not.have.property('errors');
+      expect(result).to.have.property('data');
+      expect(result).to.have.property('data').to.have.property('version', 1);
+    }
+
+    // Write new version
+    {
+      const result = await kv2.write({
+        mountPath,
         path: 'new-test',
         data: {
           baz: 'qux'
         }
       });
-      console.log('wrote new version', writeNew);
-    });
+
+      expect(result).not.have.property('errors');
+      expect(result).to.have.property('data');
+      expect(result).to.have.property('data').to.have.property('version', 2);
+    }
   });
 
-  it('should delete a version and undelete it', () => {
-    return promisify(async () => {
-      await kv2.delete({
-        mountPath: 'secret',
-        path: 'new-test',
-        versions: [1]
-      });
-      console.log('deleted');
-      await kv2.undelete({
-        mountPath: 'secret',
-        path: 'new-test',
-        versions: [1]
-      });
-      console.log('undeleted');
+  it('should delete a version and undelete it', async () => {
+    await createEngine();
+
+    await kv2.write({
+      mountPath,
+      path: 'new-test',
+      data: { foo: 'bar' }
     });
+
+    const deleted = await kv2.delete({
+      mountPath,
+      path: 'new-test',
+      versions: [1]
+    });
+    expect(deleted).to.be.true;
+
+    const undeleted = await kv2.undelete({
+      mountPath,
+      path: 'new-test',
+      versions: [1]
+    });
+    expect(undeleted).to.be.true;
   });
 
-  it('should be able to read the secret', () => {
-    return promisify(async () => {
-      const { data } = await kv2.read({
-        mountPath: 'secret',
-        path: 'new-test'
-      });
-      console.log(data);
+  it('should be able to read the secret', async () => {
+    await createEngine();
+
+    await kv2.write({
+      mountPath,
+      path: 'new-test',
+      data: { foo: 'bar' }
     });
+
+    const result = await kv2.read({
+      mountPath,
+      path: 'new-test'
+    });
+
+    expect(result).to.have.property('data').to.have.property('data').to.have.property('foo', 'bar');
+    expect(result)
+      .to.have.property('data')
+      .to.have.property('metadata')
+      .to.have.property('version', 1);
   });
 
-  it('should delete the latest version', () => {
-    return promisify(async () => {
-      const metadata = await kv2.readMetadata({
-        mountPath: 'secret',
-        path: 'new-test'
-      });
-      console.log('versions', metadata.data.versions);
-      await kv2.deleteLatestVersion({
-        mountPath: 'secret',
-        path: 'new-test'
-      });
-      console.log('deleted');
+  it('should delete the latest version', async () => {
+    await createEngine();
+
+    await kv2.write({
+      mountPath,
+      path: 'new-test',
+      data: { foo: 'bar' }
     });
+
+    const metadata = await kv2.readMetadata({
+      mountPath,
+      path: 'new-test'
+    });
+
+    expect(metadata).to.have.property('data').to.have.property('current_version', 1);
+    expect(metadata).to.have.property('data').to.have.property('custom_metadata');
+    expect(metadata)
+      .to.have.property('data')
+      .to.have.property('versions')
+      .to.have.property('1')
+      .to.have.property('destroyed', false);
+
+    const deleted = await kv2.deleteLatestVersion({
+      mountPath,
+      path: 'new-test'
+    });
+    expect(deleted).to.be.true;
   });
 
-  it('should write and read metadata', () => {
-    return promisify(async () => {
-      await kv2.writeMetadata({
-        mountPath: 'secret',
-        path: 'new-test',
-        custom_metadata: {
-          foo: 'bar'
-        }
-      });
-      console.log('wrote metadata');
-      const metadata = await kv2.readMetadata({
-        mountPath: 'secret',
-        path: 'new-test'
-      });
-      console.log(metadata);
+  it('should write and read metadata', async () => {
+    await createEngine();
+
+    await kv2.write({
+      mountPath,
+      path: 'new-test',
+      data: { foo: 'bar' }
     });
+
+    const writeInfo = await kv2.writeMetadata({
+      mountPath,
+      path: 'new-test',
+      custom_metadata: {
+        foo: 'bar'
+      }
+    });
+    expect(writeInfo).to.be.true;
+
+    const patchMeta = await kv2.patchMetadata({
+      mountPath,
+      path: 'new-test',
+      custom_metadata: {
+        foo: 'baz'
+      }
+    });
+    expect(patchMeta).to.be.true;
+
+    const metadata = await kv2.readMetadata({
+      mountPath,
+      path: 'new-test'
+    });
+    expect(metadata).to.have.property('data').to.have.property('current_version', 1);
+    expect(metadata)
+      .to.have.property('data')
+      .to.have.property('custom_metadata')
+      .to.have.property('foo', 'baz');
   });
 
-  it('should delete metadata and all versions', () => {
-    return promisify(async () => {
-      await kv2.deleteMetadata({
-        mountPath: 'secret',
-        path: 'new-test'
-      });
-      console.log('deleted metadata');
+  it('should delete metadata and all versions', async () => {
+    await createEngine();
+
+    await kv2.write({
+      mountPath,
+      path: 'new-test',
+      data: { foo: 'bar' }
     });
+
+    const deleted = await kv2.deleteMetadata({
+      mountPath,
+      path: 'new-test'
+    });
+
+    expect(deleted).to.be.true;
+  });
+
+  it('should list keys', async () => {
+    await createEngine();
+
+    await kv2.write({
+      mountPath,
+      path: 'deep/new-secret',
+      data: { foo: 'bar' }
+    });
+
+    const keys = await kv2.list({
+      mountPath,
+      path: 'deep'
+    });
+
+    expect(keys).to.have.property('data').to.have.property('keys').to.include('new-secret');
+  });
+
+  it('should read subkeys', async () => {
+    await createEngine();
+
+    await kv2.write({
+      mountPath,
+      path: 'deep/new-secret',
+      data: { foo: 'bar' }
+    });
+
+    const keys = await kv2.subKeys({
+      mountPath,
+      path: 'deep/new-secret'
+    });
+
+    expect(keys).to.have.property('data').to.have.property('subkeys').to.have.property('foo');
+  });
+
+  it('should read engine config', async () => {
+    await createEngine();
+
+    const writeConfig = await kv2.config({
+      mountPath,
+      max_versions: 10
+    });
+
+    expect(writeConfig).to.be.true;
+
+    const config = await kv2.readConfig({
+      mountPath
+    });
+
+    expect(config).to.have.property('data').to.have.property('max_versions', 10);
   });
 });

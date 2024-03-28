@@ -1,19 +1,29 @@
 import { Client, generateCommand } from '@litehex/node-vault';
-import { z } from 'zod';
+import { createInstance, destroyInstance, sleep } from '@tests/utils';
 import { expect } from 'chai';
-import { sleep } from '@tests/utils';
+import { execSync } from 'node:child_process';
+import { z } from 'zod';
 
 describe('node-vault', () => {
-  const client = new Client({
-    endpoint: process.env.VAULT_ENDPOINT_URL,
-    token: process.env.VAULT_TOKEN
+  const vc = new Client();
+
+  // Launch
+  before(async () => {
+    const { root_token } = await createInstance();
+    vc.token = root_token;
+  });
+
+  // Down
+  after(async () => {
+    destroyInstance();
+    await sleep(2e3);
   });
 
   it('should be able to implement custom command', async () => {
     const fooCommand = generateCommand({
       path: '/sys/seal-status',
       method: 'GET',
-      client,
+      client: vc,
       schema: {
         response: z.any()
       }
@@ -24,7 +34,7 @@ describe('node-vault', () => {
   });
 
   it('should get seal status', async () => {
-    const result = await client.status();
+    const result = await vc.status();
 
     expect(result).to.have.property('sealed').be.a('boolean');
     expect(result).to.have.property('t').be.a('number');
@@ -39,62 +49,72 @@ describe('node-vault', () => {
   });
 
   it('should seal and unseal vault', async () => {
-    const result = await client.status();
-    if (!result.sealed) {
-      await client.seal();
-    }
+    const { root_token, keys } = await createInstance(false);
+    vc.token = root_token;
 
-    // Wait 5 seconds to ensure vault is sealed
-    await sleep(5000);
+    await sleep(1e3);
 
-    const res = await client.unseal({
-      key: process.env.VAULT_UNSEAL_KEY!
+    const status = await vc.status();
+    expect(status).to.have.property('sealed').be.a('boolean').to.be.true;
+    expect(status).to.have.property('storage_type').be.a('string').to.be.equal('inmem');
+
+    const seal = await vc.seal();
+    expect(seal).to.be.true;
+
+    // Wait  seconds to ensure vault is sealed
+    await sleep(2e3);
+
+    const unseal = await vc.unseal({
+      key: keys[0]
     });
-
-    expect(res).to.have.property('sealed', false);
+    expect(unseal).to.have.property('sealed', false);
   });
 
   it('should write, read and delete secret', async () => {
-    // Write
-    {
-      const result = await client.write({
-        path: 'secret/data/test',
-        data: {
-          foo: 'bar'
-        }
-      });
-      expect(result).to.have.property('data');
-    }
-    // Read
-    {
-      const result = await client.read({
-        path: 'secret/data/test'
-      });
-      expect(result)
-        .to.have.property('data')
-        .to.have.property('data')
-        .to.have.property('foo', 'bar');
-    }
-    // Delete
-    {
-      const result = await client.delete({
-        path: 'secret/data/test'
-      });
-      expect(result).to.true;
-    }
+    await vc.mount({
+      type: 'kv',
+      mountPath: 'secret'
+    });
+
+    await sleep(1e3);
+
+    const write = await vc.write({
+      path: 'secret/test',
+      data: {
+        foo: 'bar'
+      }
+    });
+    expect(write).to.true;
+
+    const read = await vc.read({
+      path: 'secret/test'
+    });
+    expect(read).to.have.property('data').to.have.property('data').to.have.property('foo', 'bar');
+
+    const deleted = await vc.delete({
+      path: 'secret/test'
+    });
+    expect(deleted).to.true;
   });
 
   it('should init vault', async () => {
-    // Skip if already initialized
-    const status = await client.status();
-    if (status.initialized) {
-      return;
-    }
+    execSync('docker compose up -d --force-recreate', {
+      stdio: 'ignore'
+    });
+    await sleep(1e3);
 
-    const result = await client.init({
+    const vc = new Client();
+
+    const initStats = await vc.initialized();
+    expect(initStats).to.have.property('initialized').be.a('boolean').to.be.false;
+
+    const result = await vc.init({
       secret_shares: 1,
       secret_threshold: 1
     });
-    console.log(result);
+
+    expect(result).to.have.property('keys').be.a('array').lengthOf(1);
+    expect(result).to.have.property('keys_base64').be.a('array').lengthOf(1);
+    expect(result).to.have.property('root_token').be.a('string');
   });
 });

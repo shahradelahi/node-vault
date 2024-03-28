@@ -21,12 +21,16 @@ export type ExtendedRequestInit = RequestInit & {
   strictSchema?: boolean;
 };
 
+type RequestInitWithURL = globalThis.RequestInit & {
+  url: URL;
+};
+
 export type CommandInit<Schema extends RequestSchema> = {
   method: RequestInit['method'];
   path: string;
   schema: Schema;
   client: ClientOptions;
-  refine?: (init: globalThis.RequestInit, args: CommandArgs<Schema>) => globalThis.RequestInit;
+  refine?: (init: RequestInitWithURL, args: CommandArgs<Schema>) => RequestInitWithURL;
   fetcher?: Fetcher;
 };
 

@@ -64,7 +64,7 @@ class Client {
         path: z.string()
       }),
       body: z.any(),
-      response: ApiResponseSchema
+      response: z.union([ErrorSchema, z.record(z.any()), z.boolean()])
     }
   });
 
@@ -75,7 +75,8 @@ class Client {
     schema: {
       path: z.object({
         path: z.string()
-      })
+      }),
+      response: z.union([ErrorSchema, z.boolean()])
     }
   });
 
@@ -89,20 +90,23 @@ class Client {
     path: '/sys/seal-status',
     client: this,
     schema: {
-      response: z.object({
-        type: z.string(),
-        initialized: z.boolean(),
-        sealed: z.boolean(),
-        t: z.number(),
-        n: z.number(),
-        progress: z.number(),
-        nonce: z.string(),
-        version: z.string(),
-        build_date: z.string(),
-        migration: z.boolean(),
-        recovery_seal: z.boolean(),
-        storage_type: z.string()
-      })
+      response: z.union([
+        ErrorSchema,
+        z.object({
+          type: z.string(),
+          initialized: z.boolean(),
+          sealed: z.boolean(),
+          t: z.number(),
+          n: z.number(),
+          progress: z.number(),
+          nonce: z.string(),
+          version: z.string(),
+          build_date: z.string(),
+          migration: z.boolean(),
+          recovery_seal: z.boolean(),
+          storage_type: z.string()
+        })
+      ])
     }
   });
 
@@ -165,23 +169,26 @@ class Client {
         reset: z.boolean().default(false).optional(),
         migrate: z.boolean().default(false).optional()
       }),
-      response: z.discriminatedUnion('sealed', [
-        z.object({
-          sealed: z.literal(true),
-          t: z.number(),
-          n: z.number(),
-          progress: z.number(),
-          version: z.string()
-        }),
-        z.object({
-          sealed: z.literal(false),
-          t: z.number(),
-          n: z.number(),
-          progress: z.number(),
-          version: z.string(),
-          cluster_name: z.string(),
-          cluster_id: z.string()
-        })
+      response: z.union([
+        ErrorSchema,
+        z.discriminatedUnion('sealed', [
+          z.object({
+            sealed: z.literal(true),
+            t: z.number(),
+            n: z.number(),
+            progress: z.number(),
+            version: z.string()
+          }),
+          z.object({
+            sealed: z.literal(false),
+            t: z.number(),
+            n: z.number(),
+            progress: z.number(),
+            version: z.string(),
+            cluster_name: z.string(),
+            cluster_id: z.string()
+          })
+        ])
       ])
     }
   });
@@ -196,7 +203,7 @@ class Client {
     path: '/sys/seal',
     client: this,
     schema: {
-      response: z.union([ErrorSchema, z.record(z.any())])
+      response: z.union([ErrorSchema, z.boolean()])
     }
   });
 
