@@ -1,7 +1,7 @@
 {
   "name": "@litehex/node-vault",
-  "version": "0.1.1",
-  "description": "Node.js client for the HashiCorp's Vault API",
+  "version": "0.2.0-canary.0",
+  "description": "A client for the HashiCorp's Vault API written for Node.js",
   "type": "module",
   "files": [
     "dist/**"
@@ -56,17 +56,23 @@
     "type-fest": "^4.14.0",
     "typescript": "^5.4.3"
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/shahradelahi/node-vault.git"
   },
   "keywords": [
-    "hashcorp",
+    "hashicorp",
     "vault",
     "client",
     "secrets",
-    "node",
-    "bun"
+    "node"
   ],
   "author": "Shahrad Elahi <shahrad@litehex.com> (https://github.com/shahradelahi)",
   "license": "GPL-3.0",
