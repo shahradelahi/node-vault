@@ -1,6 +1,6 @@
 {
   "name": "@litehex/node-vault",
-  "version": "0.2.0-canary.1",
+  "version": "0.2.0-canary.2",
   "description": "A client for the HashiCorp's Vault API written for Node.js",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
