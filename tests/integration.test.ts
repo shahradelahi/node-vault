@@ -34,7 +34,7 @@ describe('node-vault', () => {
   });
 
   it('should get seal status', async () => {
-    const result = await vc.status();
+    const result = await vc.sealStatus();
 
     expect(result).to.have.property('sealed').be.a('boolean');
     expect(result).to.have.property('t').be.a('number');
@@ -54,7 +54,7 @@ describe('node-vault', () => {
 
     await sleep(1e3);
 
-    const status = await vc.status();
+    const status = await vc.sealStatus();
     expect(status).to.have.property('sealed').be.a('boolean').to.be.true;
     expect(status).to.have.property('storage_type').be.a('string').to.be.equal('inmem');
 

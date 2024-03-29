@@ -23,11 +23,11 @@ export const EngineInfoSchema = z.object({
   uuid: z.string()
 });
 
-export const ErrorSchema = z.object({
+export const ErrorResponseSchema = z.object({
   errors: z.array(z.string())
 });
 
-export const ApiSuccessResponseSchema = z.object({
+export const SuccessResponseSchema = z.object({
   request_id: z.string(),
   lease_id: z.string(),
   renewable: z.boolean(),
@@ -37,7 +37,7 @@ export const ApiSuccessResponseSchema = z.object({
   auth: z.record(z.any()).nullable()
 });
 
-export const ApiResponseSchema = z.union([ErrorSchema, z.record(z.any())]);
+export const ApiResponseSchema = ErrorResponseSchema.or(z.record(z.any()));
 
 export const ClientOptionsSchema = z.object({
   endpoint: z.string().optional(),

@@ -6,6 +6,7 @@
 [![Dependency Status](https://img.shields.io/librariesio/release/npm/@litehex%2Fnode-vault.svg)](https://libraries.io/npm/@litehex%2Fnode-vault/)
 [![npm](https://img.shields.io/npm/v/@litehex/node-vault)](https://www.npmjs.com/package/@litehex/node-vault)
 [![install size](https://packagephobia.com/badge?p=@litehex/node-vault)](https://packagephobia.com/result?p=@litehex/node-vault)
+[![GPL-3.0 Licensed](https://img.shields.io/badge/License-GPL3.0-blue.svg?style=flat)](https://opensource.org/licenses/GPL-3.0)
 
 ### Notable features
 
@@ -55,7 +56,7 @@ const success = await vc.mount({
 
 console.log(success); // true
 
-const info = await vc.getMountInfo({ mountPath: 'my-secret' });
+const info = await vc.mountInfo({ mountPath: 'my-secret' });
 
 console.log(info); // { type: 'kv', options: { version: '2' }, ... }
 ```

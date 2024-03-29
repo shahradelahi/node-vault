@@ -4,12 +4,11 @@ import { expect } from 'chai';
 
 describe('Key/Value Version 2 Secrets Engine', () => {
   const vc = new Client();
-  const kv2 = vc.kv2();
 
   const mountPath = 'my-secret';
 
   const createEngine = async () => {
-    const { errors } = await vc.getMountInfo({
+    const { errors } = await vc.engineInfo({
       mountPath
     });
 
@@ -47,7 +46,7 @@ describe('Key/Value Version 2 Secrets Engine', () => {
 
     // Verify
     {
-      const result = await vc.getMountInfo({
+      const result = await vc.engineInfo({
         mountPath
       });
 
@@ -60,53 +59,49 @@ describe('Key/Value Version 2 Secrets Engine', () => {
     await createEngine();
 
     // Write
-    {
-      const result = await kv2.write({
-        mountPath,
-        path: 'new-test',
-        data: {
-          foo: 'bar'
-        }
-      });
+    const write = await vc.kv2.write({
+      mountPath,
+      path: 'new-test',
+      data: {
+        foo: 'bar'
+      }
+    });
 
-      expect(result).not.have.property('errors');
-      expect(result).to.have.property('data');
-      expect(result).to.have.property('data').to.have.property('version', 1);
-    }
+    expect(write).not.have.property('errors');
+    expect(write).to.have.property('data');
+    expect(write).to.have.property('data').to.have.property('version', 1);
 
     // Write new version
-    {
-      const result = await kv2.write({
-        mountPath,
-        path: 'new-test',
-        data: {
-          baz: 'qux'
-        }
-      });
+    const newWrite = await vc.kv2.write({
+      mountPath,
+      path: 'new-test',
+      data: {
+        baz: 'qux'
+      }
+    });
 
-      expect(result).not.have.property('errors');
-      expect(result).to.have.property('data');
-      expect(result).to.have.property('data').to.have.property('version', 2);
-    }
+    expect(newWrite).not.have.property('errors');
+    expect(newWrite).to.have.property('data');
+    expect(newWrite).to.have.property('data').to.have.property('version', 2);
   });
 
   it('should delete a version and undelete it', async () => {
     await createEngine();
 
-    await kv2.write({
+    await vc.kv2.write({
       mountPath,
       path: 'new-test',
       data: { foo: 'bar' }
     });
 
-    const deleted = await kv2.delete({
+    const deleted = await vc.kv2.delete({
       mountPath,
       path: 'new-test',
       versions: [1]
     });
     expect(deleted).to.be.true;
 
-    const undeleted = await kv2.undelete({
+    const undeleted = await vc.kv2.undelete({
       mountPath,
       path: 'new-test',
       versions: [1]
@@ -117,13 +112,13 @@ describe('Key/Value Version 2 Secrets Engine', () => {
   it('should be able to read the secret', async () => {
     await createEngine();
 
-    await kv2.write({
+    await vc.kv2.write({
       mountPath,
       path: 'new-test',
       data: { foo: 'bar' }
     });
 
-    const result = await kv2.read({
+    const result = await vc.kv2.read({
       mountPath,
       path: 'new-test'
     });
@@ -138,13 +133,13 @@ describe('Key/Value Version 2 Secrets Engine', () => {
   it('should delete the latest version', async () => {
     await createEngine();
 
-    await kv2.write({
+    await vc.kv2.write({
       mountPath,
       path: 'new-test',
       data: { foo: 'bar' }
     });
 
-    const metadata = await kv2.readMetadata({
+    const metadata = await vc.kv2.readMetadata({
       mountPath,
       path: 'new-test'
     });
@@ -157,7 +152,7 @@ describe('Key/Value Version 2 Secrets Engine', () => {
       .to.have.property('1')
       .to.have.property('destroyed', false);
 
-    const deleted = await kv2.deleteLatestVersion({
+    const deleted = await vc.kv2.deleteLatestVersion({
       mountPath,
       path: 'new-test'
     });
@@ -167,13 +162,13 @@ describe('Key/Value Version 2 Secrets Engine', () => {
   it('should write and read metadata', async () => {
     await createEngine();
 
-    await kv2.write({
+    await vc.kv2.write({
       mountPath,
       path: 'new-test',
       data: { foo: 'bar' }
     });
 
-    const writeInfo = await kv2.writeMetadata({
+    const writeInfo = await vc.kv2.writeMetadata({
       mountPath,
       path: 'new-test',
       custom_metadata: {
@@ -182,7 +177,7 @@ describe('Key/Value Version 2 Secrets Engine', () => {
     });
     expect(writeInfo).to.be.true;
 
-    const patchMeta = await kv2.patchMetadata({
+    const patchMeta = await vc.kv2.patchMetadata({
       mountPath,
       path: 'new-test',
       custom_metadata: {
@@ -191,7 +186,7 @@ describe('Key/Value Version 2 Secrets Engine', () => {
     });
     expect(patchMeta).to.be.true;
 
-    const metadata = await kv2.readMetadata({
+    const metadata = await vc.kv2.readMetadata({
       mountPath,
       path: 'new-test'
     });
@@ -205,13 +200,13 @@ describe('Key/Value Version 2 Secrets Engine', () => {
   it('should delete metadata and all versions', async () => {
     await createEngine();
 
-    await kv2.write({
+    await vc.kv2.write({
       mountPath,
       path: 'new-test',
       data: { foo: 'bar' }
     });
 
-    const deleted = await kv2.deleteMetadata({
+    const deleted = await vc.kv2.deleteMetadata({
       mountPath,
       path: 'new-test'
     });
@@ -222,13 +217,13 @@ describe('Key/Value Version 2 Secrets Engine', () => {
   it('should list keys', async () => {
     await createEngine();
 
-    await kv2.write({
+    await vc.kv2.write({
       mountPath,
       path: 'deep/new-secret',
       data: { foo: 'bar' }
     });
 
-    const keys = await kv2.list({
+    const keys = await vc.kv2.list({
       mountPath,
       path: 'deep'
     });
@@ -239,13 +234,13 @@ describe('Key/Value Version 2 Secrets Engine', () => {
   it('should read subkeys', async () => {
     await createEngine();
 
-    await kv2.write({
+    await vc.kv2.write({
       mountPath,
       path: 'deep/new-secret',
       data: { foo: 'bar' }
     });
 
-    const keys = await kv2.subKeys({
+    const keys = await vc.kv2.subKeys({
       mountPath,
       path: 'deep/new-secret'
     });
@@ -256,14 +251,14 @@ describe('Key/Value Version 2 Secrets Engine', () => {
   it('should read engine config', async () => {
     await createEngine();
 
-    const writeConfig = await kv2.config({
+    const writeConfig = await vc.kv2.config({
       mountPath,
       max_versions: 10
     });
 
     expect(writeConfig).to.be.true;
 
-    const config = await kv2.readConfig({
+    const config = await vc.kv2.readConfig({
       mountPath
     });
 
