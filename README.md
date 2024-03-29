@@ -11,7 +11,7 @@
 ### Notable features
 
 - Mostly type-safe
-- Highly extend and flexible
+- Highly extendable and configurable
 
 ### Installation
 
@@ -92,6 +92,7 @@ suggestions.
 ### Relevant
 
 - HashiCorp's Vault [API docs](https://developer.hashicorp.com/vault/api-docs)
+- [Minimal CLI for K/V V2 engine](https://github.com/shahradelahi/vault-cli)
 
 ### License
 
