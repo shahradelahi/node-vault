@@ -19,6 +19,17 @@ describe('node-vault', () => {
     await sleep(2e3);
   });
 
+  it('should get vault health', async () => {
+    const resp = await vc.health();
+    expect(resp).to.have.property('initialized').be.a('boolean').to.be.true;
+  });
+
+  it('should get host info', async () => {
+    const resp = await vc.hostInfo();
+    expect(resp).to.have.property('data').to.have.property('cpu').to.be.a('array');
+    expect(resp).to.have.property('data').to.have.property('host').to.be.a('object');
+  });
+
   it('should be able to implement custom command', async () => {
     const fooCommand = generateCommand({
       path: '/sys/seal-status',

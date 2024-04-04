@@ -1,3 +1,4 @@
+import { expect } from 'chai';
 import { execSync } from 'node:child_process';
 import { Client } from '@litehex/node-vault';
 
@@ -17,10 +18,13 @@ export async function createInstance(unsealed: boolean = true): Promise<{
 
   const vc = new Client();
 
-  const { keys, root_token } = await vc.init({
+  const resp = await vc.init({
     secret_shares: 1,
     secret_threshold: 1
   });
+  expect(resp).not.have.property('errors');
+
+  const { keys, root_token } = resp as any;
 
   await sleep(1e3);
 

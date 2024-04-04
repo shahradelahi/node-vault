@@ -8,11 +8,11 @@ describe('Key/Value Version 2 Secrets Engine', () => {
   const mountPath = 'my-secret';
 
   const createEngine = async () => {
-    const { errors } = await vc.engineInfo({
+    const resp = await vc.engineInfo({
       mountPath
     });
 
-    if (!errors) {
+    if (!('errors' in resp)) {
       await vc.unmount({ mountPath });
     }
 

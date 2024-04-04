@@ -579,6 +579,155 @@ class Client {
       }
     });
   }
+
+  /**
+   * Read health information
+   *
+   * @link https://developer.hashicorp.com/vault/api-docs/system/health#read-health-information
+   */
+  get health() {
+    return generateCommand({
+      method: 'GET',
+      path: '/sys/health',
+      client: this,
+      schema: {
+        response: ErrorResponseSchema.or(
+          z.object({
+            initialized: z.boolean(),
+            sealed: z.boolean(),
+            standby: z.boolean(),
+            performance_standby: z.boolean(),
+            replication_performance_mode: z.string(),
+            replication_dr_mode: z.string(),
+            server_time_utc: z.number(),
+            version: z.string(),
+            cluster_name: z.string(),
+            cluster_id: z.string()
+          })
+        )
+      }
+    });
+  }
+
+  /**
+   * Collect host information
+   *
+   * @link https://developer.hashicorp.com/vault/api-docs/system/host-info#collect-host-information
+   */
+  get hostInfo() {
+    return generateCommand({
+      method: 'GET',
+      path: '/sys/host-info',
+      client: this,
+      schema: {
+        response: ErrorResponseSchema.or(
+          SuccessResponseSchema.extend({
+            data: z.object({
+              cpu: z.array(
+                z.object({
+                  cpu: z.number(),
+                  vendorId: z.string(),
+                  family: z.string(),
+                  model: z.string(),
+                  stepping: z.number(),
+                  physicalId: z.string(),
+                  coreId: z.string(),
+                  cores: z.number(),
+                  modelName: z.string(),
+                  mhz: z.number(),
+                  cacheSize: z.number(),
+                  flags: z.array(z.string()),
+                  microcode: z.string()
+                })
+              ),
+              cpu_times: z.array(
+                z.object({
+                  cpu: z.string(),
+                  user: z.number(),
+                  system: z.number(),
+                  idle: z.number(),
+                  nice: z.number(),
+                  iowait: z.number(),
+                  irq: z.number(),
+                  softirq: z.number(),
+                  steal: z.number(),
+                  guest: z.number(),
+                  guestNice: z.number()
+                })
+              ),
+              disk: z.array(
+                z.object({
+                  path: z.string(),
+                  fstype: z.string(),
+                  total: z.number(),
+                  free: z.number(),
+                  used: z.number(),
+                  usedPercent: z.number(),
+                  inodesTotal: z.number(),
+                  inodesUsed: z.number(),
+                  inodesFree: z.number(),
+                  inodesUsedPercent: z.number()
+                })
+              ),
+              host: z.object({
+                hostname: z.string(),
+                uptime: z.number(),
+                bootTime: z.number(),
+                procs: z.number(),
+                os: z.string(),
+                platform: z.string(),
+                platformFamily: z.string(),
+                platformVersion: z.string(),
+                kernelVersion: z.string(),
+                kernelArch: z.string(),
+                virtualizationSystem: z.string(),
+                virtualizationRole: z.string(),
+                hostid: z.string()
+              }),
+              memory: z.object({
+                total: z.number(),
+                available: z.number(),
+                used: z.number(),
+                usedPercent: z.number(),
+                free: z.number(),
+                active: z.number(),
+                inactive: z.number(),
+                wired: z.number(),
+                laundry: z.number(),
+                buffers: z.number(),
+                cached: z.number(),
+                writeback: z.number(),
+                dirty: z.number(),
+                writebacktmp: z.number(),
+                shared: z.number(),
+                slab: z.number(),
+                sreclaimable: z.number(),
+                sunreclaim: z.number(),
+                pagetables: z.number(),
+                swapcached: z.number(),
+                commitlimit: z.number(),
+                committedas: z.number(),
+                hightotal: z.number(),
+                highfree: z.number(),
+                lowtotal: z.number(),
+                lowfree: z.number(),
+                swaptotal: z.number(),
+                swapfree: z.number(),
+                mapped: z.number(),
+                vmalloctotal: z.number(),
+                vmallocused: z.number(),
+                vmallocchunk: z.number(),
+                hugepagestotal: z.number(),
+                hugepagesfree: z.number(),
+                hugepagesize: z.number()
+              }),
+              timestamp: z.string()
+            })
+          })
+        )
+      }
+    });
+  }
 }
 
 export { Client };
