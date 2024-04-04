@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
-import type { z } from 'zod';
-import { JsonObject, PartialDeep } from 'type-fest';
-import type { ZodRequestInit, RequestSchema as ZodRequestSchema } from 'zod-request';
-import type { RequestInit } from 'undici';
 import { ClientOptionsSchema } from '@/schema';
+import { JsonObject, PartialDeep } from 'type-fest';
+import { RequestInit, Response } from 'undici';
+import type { z } from 'zod';
+import type { RequestSchema as ZodRequestSchema, ZodRequestInit } from 'zod-request';
 
 export type ClientOptions = z.infer<typeof ClientOptionsSchema> & {
   request?: PartialDeep<RequestInit>;
@@ -51,7 +51,13 @@ export type CommandArgs<Schema extends RequestSchema> =
           ? z.infer<Schema['body']>
           : {});
 
-export type CommandFn<Schema extends RequestSchema> = (
+export type CommandFn<Schema extends RequestSchema, RawResponse extends boolean = false> = (
   args?: CommandArgs<Schema>,
   options?: Omit<ExtendedRequestInit, 'url'>
-) => Promise<Schema['response'] extends z.ZodType ? z.infer<Schema['response']> : unknown>;
+) => Promise<
+  RawResponse extends true
+    ? Response
+    : Schema['response'] extends z.ZodType
+      ? z.infer<Schema['response']>
+      : unknown
+>;

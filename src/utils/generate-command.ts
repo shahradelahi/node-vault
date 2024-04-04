@@ -7,9 +7,11 @@ import { generateRequest, ZodResponse } from 'zod-request';
 import { isJson } from './is-json';
 import { removeUndefined } from './object';
 
-export function generateCommand<Schema extends RequestSchema>(
-  init: CommandInit<Schema>
-): CommandFn<Schema> {
+export function generateCommand<Schema extends RequestSchema, RawResponse extends boolean = false>(
+  init: CommandInit<Schema>,
+  // @ts-expect-error Type 'RawResponse' is not assignable to type 'boolean'
+  raw: RawResponse = false
+): CommandFn<Schema, RawResponse> {
   return async (args, options = {}) => {
     const { method = 'GET', path, client, schema } = init;
     const { strictSchema = true, ...opts } = options;
@@ -68,10 +70,14 @@ export function generateCommand<Schema extends RequestSchema>(
     }
 
     const response = await fetcher(url, refinedInput);
+    if (raw) {
+      return response;
+    }
+
     const { headers } = response;
 
     const hasContent = headers.has('content-length') && headers.get('content-length') !== '0';
-    if (!hasContent) {
+    if (!response.body && !hasContent) {
       return response.ok;
     }
 
