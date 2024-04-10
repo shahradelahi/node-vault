@@ -46,3 +46,5 @@ export const ClientOptionsSchema = z.object({
   token: z.string().optional(),
   namespace: z.string().optional()
 });
+
+export const ZodAnyRecord = z.record(z.any());

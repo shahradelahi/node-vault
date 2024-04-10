@@ -1,4 +1,5 @@
 import { Aws } from '@/engine/aws';
+import { Kubernetes } from '@/engine/kubernetes';
 import { Kv2 } from '@/engine/kv2';
 import {
   ApiResponseSchema,
@@ -35,17 +36,24 @@ class Client {
   }
 
   /**
-   * Key/Value Version 2
-   */
-  get kv2() {
-    return new Kv2(this);
-  }
-
-  /**
    * AWS secrets engine
    */
   get aws() {
     return new Aws(this);
+  }
+
+  /**
+   * Kubernetes secrets engine
+   */
+  get kubernetes() {
+    return new Kubernetes(this);
+  }
+
+  /**
+   * Key/Value Version 2
+   */
+  get kv2() {
+    return new Kv2(this);
   }
 
   config = generateCommand({
