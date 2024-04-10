@@ -41,6 +41,9 @@ jobs:
 
   tests:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [ 18, 20 ]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v2
@@ -48,11 +51,8 @@ jobs:
           version: 8
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
-
-      - name: Write Test Environment Variables
-        run: echo "${{ secrets.TEST_ENV_VARIABLES }}" > .env
 
       - name: Install docker
         run: |
