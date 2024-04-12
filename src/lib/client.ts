@@ -1,5 +1,6 @@
 import { Aws } from '@/engine/aws';
 import { Kubernetes } from '@/engine/kubernetes';
+import { Kv } from '@/engine/kv';
 import { Kv2 } from '@/engine/kv2';
 import {
   ApiResponseSchema,
@@ -47,6 +48,13 @@ class Client {
    */
   get kubernetes() {
     return new Kubernetes(this);
+  }
+
+  /**
+   * Key/Value Version 1
+   */
+  get kv() {
+    return new Kv(this);
   }
 
   /**
