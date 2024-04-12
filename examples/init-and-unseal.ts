@@ -5,7 +5,7 @@ import { sleep } from '@examples/utils';
 execSync('docker compose up -d --force-recreate');
 await sleep(5e3);
 
-//////////
+// ----------------------------
 
 const vc = new Client();
 
@@ -19,8 +19,3 @@ vc.token = root_token;
 
 const unsealed = await vc.unseal({ key: keys[0] });
 console.log('unsealed', unsealed); // { type: 'shamir', initialized: true, sealed: false, ... }
-
-//////////
-
-// Down
-execSync('docker compose down');

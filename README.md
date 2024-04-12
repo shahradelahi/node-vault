@@ -13,13 +13,13 @@
 - Mostly type-safe
 - Highly extendable and configurable
 
-### Installation
+### 📦 Installation
 
 ```bash
 npm install @litehex/node-vault
 ```
 
-### Usage
+### 📖 Usage
 
 ##### Init and unseal vault
 
@@ -46,17 +46,17 @@ const unsealed = await vc.unseal({ key: keys[0] });
 console.log(unsealed); // { type: 'shamir', initialized: true, sealed: false, ... }
 ```
 
-##### Create KV2 engine
+##### Create Key/Value V2 engine
 
 ```typescript
-const success = await vc.mount({
+const mounted = await vc.mount({
   mountPath: 'my-secret',
   type: 'kv-v2'
 });
 
-console.log(success); // true
+console.log(mounted); // true
 
-const info = await vc.mountInfo({ mountPath: 'my-secret' });
+const info = await vc.engineInfo({ mountPath: 'my-secret' });
 
 console.log(info); // { type: 'kv', options: { version: '2' }, ... }
 ```
@@ -64,26 +64,30 @@ console.log(info); // { type: 'kv', options: { version: '2' }, ... }
 ##### Write, read and delete secrets
 
 ```typescript
-const write = await vc.write({
-  path: 'my-secret/data/hello',
+const mountPath = 'my-secret';
+const path = 'hello';
+
+const write = await vc.kv2.write({
+  mountPath,
+  path,
   data: { foo: 'bar' }
 });
 console.log(write); // { request_id: '...', lease_id: '...', ... }
 
-const read = await vc.read({ path: 'my-secret/data/hello' });
+const read = await vc.kv2.read({ mountPath, path });
 console.log(read); // { request_id: '...', lease_id: '...', ... }
 
-const deleted = await vc.delete({ path: 'my-secret/data/hello' });
+const deleted = await vc.kv2.deleteLatest({ mountPath, path });
 console.log(deleted); // true
 ```
 
 Check out the [examples](/examples) and [tests](/tests) directory for more examples.
 
-### Documentation
+### 📚 Documentation
 
 For all configuration options, please see [the API docs](https://paka.dev/npm/@litehex/node-vault).
 
-### Contributing
+### 🤝 Contributing
 
 You can contribute to this project by opening an issue or a pull request
 on [GitHub](https://github.com/shahradelahi/node-vault). Feel free to contribute, we care about your ideas and
