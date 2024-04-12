@@ -2,7 +2,7 @@ import { Client } from '@litehex/node-vault';
 import { createInstance, destroyInstance, sleep } from '@tests/utils';
 import { expect } from 'chai';
 
-describe('Key/Value Version 2 Secrets Engine', () => {
+describe('Key/Value Secrets Engine - Version 2', () => {
   const vc = new Client();
 
   const mountPath = 'my-secret';
@@ -16,9 +16,11 @@ describe('Key/Value Version 2 Secrets Engine', () => {
       await vc.unmount({ mountPath });
     }
 
-    await sleep(1e3);
+    await sleep(500);
 
     await vc.mount({ mountPath, type: 'kv-v2' });
+
+    await sleep(500);
   };
 
   // Launch

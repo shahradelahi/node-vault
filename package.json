@@ -24,11 +24,11 @@
     "build": "tsup",
     "test": "mocha \"**/*.test.ts\" --retries 2",
     "type-check": "tsc --noEmit",
-    "lint": "eslint \"src/**/*.ts\"",
-    "lint:fix": "eslint --fix \"src/**/*.ts\"",
+    "lint": "eslint \"**/*.ts\"",
+    "lint:fix": "eslint --fix \"**/*.ts\"",
     "format:check": "prettier --check \"**/*.{js,ts,md}\"",
     "format": "prettier --write .",
-    "prepublishOnly": "pnpm test && pnpm run format:check && pnpm run type-check && pnpm build"
+    "prepublishOnly": "pnpm test && pnpm lint && pnpm run format:check && pnpm build"
   },
   "packageManager": "pnpm@8.15.0",
   "dependencies": {

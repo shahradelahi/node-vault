@@ -14,5 +14,5 @@
     "@typescript-eslint/semi": "off",
     "@typescript-eslint/no-explicit-any": "off"
   },
-  "ignorePatterns": ["examples"]
+  "ignorePatterns": ["examples", "dist"]
 }
