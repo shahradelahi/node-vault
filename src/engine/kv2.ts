@@ -1,6 +1,6 @@
 import { generateCommand } from '@/index';
 import { ApiSector } from '@/lib/sector';
-import { ErrorResponseSchema, SuccessResponseSchema } from '@/schema';
+import { ErrorResponseSchema, SuccessResponseSchema, ZodAnyRecord } from '@/schema';
 import { z } from 'zod';
 
 export class Kv2 extends ApiSector {
@@ -185,7 +185,7 @@ export class Kv2 extends ApiSector {
    *
    * @link https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#delete-latest-version-of-secret
    */
-  get deleteLatestVersion() {
+  get deleteLatest() {
     return generateCommand({
       method: 'DELETE',
       path: '/{{mountPath}}/data/{{path}}',
@@ -401,6 +401,62 @@ export class Kv2 extends ApiSector {
           path: z.string()
         }),
         response: z.union([ErrorResponseSchema, z.boolean()])
+      }
+    });
+  }
+
+  /**
+   * Engine info
+   */
+  get info() {
+    return generateCommand({
+      method: 'GET',
+      path: '/sys/mounts/{{mountPath}}',
+      client: this.client,
+      schema: {
+        path: z.object({
+          mountPath: z.string()
+        }),
+        response: ErrorResponseSchema.or(
+          SuccessResponseSchema.extend({
+            local: z.boolean(),
+            seal_wrap: z.boolean(),
+            external_entropy_access: z.boolean(),
+            options: ZodAnyRecord,
+            running_sha256: z.string(),
+            deprecation_status: z.string(),
+            config: z.object({
+              default_lease_ttl: z.number(),
+              force_no_cache: z.boolean(),
+              max_lease_ttl: z.number()
+            }),
+            type: z.string(),
+            description: z.string(),
+            accessor: z.string(),
+            uuid: z.string(),
+            plugin_version: z.string(),
+            running_plugin_version: z.string(),
+            data: z.object({
+              accessor: z.string(),
+              config: z.object({
+                default_lease_ttl: z.number(),
+                force_no_cache: z.boolean(),
+                max_lease_ttl: z.number()
+              }),
+              deprecation_status: z.string(),
+              description: z.string(),
+              external_entropy_access: z.boolean(),
+              local: z.boolean(),
+              options: ZodAnyRecord,
+              plugin_version: z.string(),
+              running_plugin_version: z.string(),
+              running_sha256: z.string(),
+              seal_wrap: z.boolean(),
+              type: z.string(),
+              uuid: z.string()
+            })
+          })
+        )
       }
     });
   }

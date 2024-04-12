@@ -17,7 +17,7 @@ export class Aws extends ApiSector {
     return generateCommand({
       method: 'POST',
       path: '/aws/config/root',
-      client: this,
+      client: this.client,
       schema: {
         body: z.object({
           max_retries: z.number().optional(),
@@ -45,7 +45,7 @@ export class Aws extends ApiSector {
     return generateCommand({
       method: 'GET',
       path: '/aws/config/root',
-      client: this,
+      client: this.client,
       schema: {
         response: z.any()
       }
@@ -61,7 +61,7 @@ export class Aws extends ApiSector {
     return generateCommand({
       method: 'POST',
       path: '/aws/config/rotate-root',
-      client: this,
+      client: this.client,
       schema: {
         response: z.any()
       }
@@ -77,7 +77,7 @@ export class Aws extends ApiSector {
     return generateCommand({
       method: 'POST',
       path: '/aws/config/lease',
-      client: this,
+      client: this.client,
       schema: {
         body: z.object({
           lease: z.string(),
@@ -97,7 +97,7 @@ export class Aws extends ApiSector {
     return generateCommand({
       method: 'POST',
       path: '/aws/config/lease',
-      client: this,
+      client: this.client,
       schema: {
         response: z.any()
       }
@@ -113,7 +113,7 @@ export class Aws extends ApiSector {
     return generateCommand({
       method: 'POST',
       path: '/aws/config/role',
-      client: this,
+      client: this.client,
       schema: {
         body: z.object({
           name: z.string(),
@@ -145,7 +145,7 @@ export class Aws extends ApiSector {
     return generateCommand({
       method: 'GET',
       path: '/aws/roles/{{name}}',
-      client: this,
+      client: this.client,
       schema: {
         path: z.object({
           name: z.string()
@@ -164,7 +164,7 @@ export class Aws extends ApiSector {
     return generateCommand({
       method: 'LIST',
       path: '/aws/roles',
-      client: this,
+      client: this.client,
       schema: {
         response: z.any()
       }
@@ -180,7 +180,7 @@ export class Aws extends ApiSector {
     return generateCommand({
       method: 'DELETE',
       path: '/aws/roles/{{name}}',
-      client: this,
+      client: this.client,
       schema: {
         path: z.object({
           name: z.string()
@@ -199,7 +199,7 @@ export class Aws extends ApiSector {
     return generateCommand({
       method: 'GET',
       path: '/aws/creds/{{name}}',
-      client: this,
+      client: this.client,
       schema: {
         path: z.object({
           name: z.string()
@@ -224,7 +224,7 @@ export class Aws extends ApiSector {
     return generateCommand({
       method: 'POST',
       path: '/aws/static-roles/{{name}}',
-      client: this,
+      client: this.client,
       schema: {
         path: z.object({
           name: z.string()
@@ -247,7 +247,7 @@ export class Aws extends ApiSector {
     return generateCommand({
       method: 'GET',
       path: '/aws/static-roles/{{name}}',
-      client: this,
+      client: this.client,
       schema: {
         path: z.object({
           name: z.string()
@@ -266,7 +266,7 @@ export class Aws extends ApiSector {
     return generateCommand({
       method: 'DELETE',
       path: '/aws/static-roles/{{name}}',
-      client: this,
+      client: this.client,
       schema: {
         path: z.object({
           name: z.string()
@@ -285,7 +285,7 @@ export class Aws extends ApiSector {
     return generateCommand({
       method: 'GET',
       path: '/aws/static-creds/{{name}}',
-      client: this,
+      client: this.client,
       schema: {
         path: z.object({
           name: z.string()

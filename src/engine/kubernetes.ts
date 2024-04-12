@@ -18,7 +18,7 @@ export class Kubernetes extends ApiSector {
     return generateCommand({
       method: 'POST',
       path: '/kubernetes/config',
-      client: this,
+      client: this.client,
       schema: {
         // Parameters
         //
@@ -46,7 +46,7 @@ export class Kubernetes extends ApiSector {
     return generateCommand({
       method: 'GET',
       path: '/kubernetes/config',
-      client: this,
+      client: this.client,
       schema: {
         response: ErrorResponseSchema.or(ZodAnyRecord)
       }
@@ -62,7 +62,7 @@ export class Kubernetes extends ApiSector {
     return generateCommand({
       method: 'DELETE',
       path: '/kubernetes/config',
-      client: this,
+      client: this.client,
       schema: {
         response: ErrorResponseSchema.or(z.boolean())
       }
@@ -78,7 +78,7 @@ export class Kubernetes extends ApiSector {
     return generateCommand({
       method: 'POST',
       path: '/kubernetes/roles/{{name}}',
-      client: this,
+      client: this.client,
       schema: {
         // Parameters
         //
@@ -126,7 +126,7 @@ export class Kubernetes extends ApiSector {
     return generateCommand({
       method: 'GET',
       path: '/kubernetes/roles/{{name}}',
-      client: this,
+      client: this.client,
       schema: {
         path: z.object({
           name: z.string()
@@ -145,7 +145,7 @@ export class Kubernetes extends ApiSector {
     return generateCommand({
       method: 'LIST',
       path: '/kubernetes/roles',
-      client: this,
+      client: this.client,
       schema: {
         response: ErrorResponseSchema.or(ZodAnyRecord)
       }
@@ -161,7 +161,7 @@ export class Kubernetes extends ApiSector {
     return generateCommand({
       method: 'DELETE',
       path: '/kubernetes/roles/{{name}}',
-      client: this,
+      client: this.client,
       schema: {
         path: z.object({
           name: z.string()
@@ -180,7 +180,7 @@ export class Kubernetes extends ApiSector {
     return generateCommand({
       method: 'POST',
       path: '/kubernetes/creds/{{name}}',
-      client: this,
+      client: this.client,
       schema: {
         // Parameters
         //

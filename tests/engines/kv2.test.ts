@@ -37,24 +37,20 @@ describe('Key/Value Secrets Engine - Version 2', () => {
 
   it('should mount the secrets engine', async () => {
     // Create
-    {
-      const result = await vc.mount({
-        mountPath,
-        type: 'kv-v2'
-      });
+    const mounted = await vc.mount({
+      mountPath,
+      type: 'kv-v2'
+    });
 
-      expect(result).to.true;
-    }
+    expect(mounted).to.true;
 
     // Verify
-    {
-      const result = await vc.engineInfo({
-        mountPath
-      });
+    const info = await vc.kv2.info({
+      mountPath
+    });
 
-      expect(result).to.have.property('type', 'kv');
-      expect(result).to.have.property('options').to.have.property('version', '2');
-    }
+    expect(info).to.have.property('type', 'kv');
+    expect(info).to.have.property('options').to.have.property('version', '2');
   });
 
   it('should create a secret path and write a new version', async () => {
@@ -154,7 +150,7 @@ describe('Key/Value Secrets Engine - Version 2', () => {
       .to.have.property('1')
       .to.have.property('destroyed', false);
 
-    const deleted = await vc.kv2.deleteLatestVersion({
+    const deleted = await vc.kv2.deleteLatest({
       mountPath,
       path: 'new-test'
     });
