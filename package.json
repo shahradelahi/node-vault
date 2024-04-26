@@ -23,12 +23,11 @@
   "scripts": {
     "build": "tsup",
     "test": "mocha \"**/*.test.ts\" --retries 2",
-    "type-check": "tsc --noEmit",
-    "lint": "eslint \"**/*.ts\"",
-    "lint:fix": "eslint --fix \"**/*.ts\"",
-    "format:check": "prettier --check \"**/*.{js,ts,md,yml}\"",
-    "format": "prettier --write . \"**/*.{js,ts,md,yml}\"",
-    "prepublishOnly": "pnpm test && pnpm lint && pnpm run format:check && pnpm build"
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "format:check": "prettier --check .",
+    "format": "prettier --write .",
+    "prepublishOnly": "pnpm test && pnpm lint && pnpm format:check && pnpm build"
   },
   "packageManager": "pnpm@8.15.0",
   "dependencies": {
