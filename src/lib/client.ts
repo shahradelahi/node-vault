@@ -11,7 +11,6 @@ import {
 } from '@/schema';
 import { ClientOptions } from '@/typings';
 import { generateCommand } from '@litehex/node-vault';
-import { PartialDeep } from 'type-fest';
 import type { RequestInit } from 'undici';
 import { z } from 'zod';
 
@@ -21,7 +20,7 @@ class Client {
   pathPrefix: string;
   namespace: string | undefined;
   token: string | undefined;
-  request: PartialDeep<Omit<RequestInit, 'url'>> | undefined;
+  request: Partial<Omit<RequestInit, 'url'>> | undefined;
 
   constructor(protected opts: ClientOptions = {}) {
     const { request, ...restOpts } = opts;
