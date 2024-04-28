@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
 import { ClientOptionsSchema } from '@/schema';
-import { JsonObject, PartialDeep } from 'type-fest';
 import { RequestInit, Response } from 'undici';
 import type { z } from 'zod';
 import type { RequestSchema as ZodRequestSchema, ZodRequestInit } from 'zod-request';
 
 export type ClientOptions = z.infer<typeof ClientOptionsSchema> & {
-  request?: PartialDeep<RequestInit>;
+  request?: Partial<RequestInit>;
   fetcher?: Fetcher;
 };
 
@@ -46,7 +45,7 @@ export type CommandArgs<Schema extends RequestSchema> =
     (Schema['body'] extends z.ZodDiscriminatedUnion<any, any>
       ? z.infer<Schema['body']>
       : Schema['body'] extends z.ZodAny
-        ? JsonObject
+        ? {}
         : Schema['body'] extends z.ZodObject<any>
           ? z.infer<Schema['body']>
           : {});
