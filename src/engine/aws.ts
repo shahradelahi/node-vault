@@ -216,31 +216,31 @@ export class Aws extends ApiSector {
     });
   }
 
-    /**
+  /**
    * Generate credentials for the path `/aws/sts/:name`
    *
    * @link https://developer.hashicorp.com/vault/api-docs/secret/aws#generate-credentials
    */
-    get stsCredentials() {
-      return generateCommand({
-        method: 'POST',
-        path: '/aws/sts/{{name}}',
-        client: this.client,
-        schema: {
-          path: z.object({
-            name: z.string(),
-            isSTS: z.boolean().optional()
-          }),
-          searchParams: z.object({
-            role_arn: z.string().optional(),
-            role_session_name: z.string().optional(),
-            ttl: z.string().optional(),
-            mfa_code: z.string().optional()
-          }),
-          response: z.any()
-        }
-      });
-    }
+  get stsCredentials() {
+    return generateCommand({
+      method: 'POST',
+      path: '/aws/sts/{{name}}',
+      client: this.client,
+      schema: {
+        path: z.object({
+          name: z.string(),
+          isSTS: z.boolean().optional()
+        }),
+        searchParams: z.object({
+          role_arn: z.string().optional(),
+          role_session_name: z.string().optional(),
+          ttl: z.string().optional(),
+          mfa_code: z.string().optional()
+        }),
+        response: z.any()
+      }
+    });
+  }
 
   /**
    * Create/Update static role
