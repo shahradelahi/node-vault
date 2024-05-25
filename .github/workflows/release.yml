@@ -1,20 +1,18 @@
 name: Release Package
 
-##
-# Invoke:
-#   gh workflow run "Release Package"
-##
-
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - master
 
 jobs:
   release:
+    if: github.repository == 'shahradelahi/node-vault'
     name: Build & Publish Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -24,7 +22,7 @@ jobs:
           version: 8
 
       - name: Use Node v18
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: pnpm
@@ -38,7 +36,7 @@ jobs:
         with:
           commit: 'chore(release): version package'
           title: 'chore(release): version package'
-          publish: npm publish && changeset publish
+          publish: pnpm ci:publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.PRIVATE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

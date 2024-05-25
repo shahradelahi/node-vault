@@ -27,6 +27,7 @@
     "lint:fix": "eslint --fix .",
     "format:check": "prettier --check .",
     "format": "prettier --write .",
+    "ci:publish": "pnpm publish && changeset publish",
     "prepublishOnly": "pnpm test && pnpm lint && pnpm format:check && pnpm build"
   },
   "packageManager": "pnpm@8.15.0",
