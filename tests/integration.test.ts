@@ -99,7 +99,7 @@ describe('node-vault', () => {
     const read = await vc.read({
       path: 'secret/test'
     });
-    expect(read).to.have.property('data').to.have.property('data').to.have.property('foo', 'bar');
+    expect(read).to.have.property('data').to.have.property('foo', 'bar');
 
     const deleted = await vc.delete({
       path: 'secret/test'
@@ -126,14 +126,16 @@ describe('node-vault', () => {
     expect(result).to.have.property('root_token').be.a('string');
   });
 
-  const { HTTP_PROXY } = process.env;
-  if (HTTP_PROXY) {
-    it('should support proxy', async () => {
-      const agent = new ProxyAgent(HTTP_PROXY);
+  it('should support proxy', async function () {
+    const { HTTP_PROXY } = process.env;
+    if (!HTTP_PROXY) {
+      return this.skip();
+    }
 
-      const status = await vc.sealStatus(undefined, { dispatcher: agent });
+    const agent = new ProxyAgent(HTTP_PROXY);
 
-      expect(status).to.have.property('sealed').be.a('boolean');
-    });
-  }
+    const status = await vc.sealStatus(undefined, { dispatcher: agent });
+
+    expect(status).to.have.property('sealed').be.a('boolean');
+  });
 });
