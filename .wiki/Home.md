@@ -185,5 +185,3 @@ Welcome to the node-vault wiki!
 
 - [ ] [/sys/storage/raft](https://developer.hashicorp.com/vault/api-docs/system/storage/raft)
 - [ ] [/sys/storage/raft/snapshot-auto](https://developer.hashicorp.com/vault/api-docs/system/storage/raftautosnapshots)
-
-
