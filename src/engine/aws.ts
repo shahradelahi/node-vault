@@ -202,15 +202,9 @@ export class Aws extends ApiSector {
       client: this.client,
       schema: {
         path: z.object({
-          name: z.string(),
-          isSTS: z.boolean().optional()
+          name: z.string()
         }),
-        searchParams: z.object({
-          role_arn: z.string().optional(),
-          role_session_name: z.string().optional(),
-          ttl: z.string().optional(),
-          mfa_code: z.string().optional()
-        }),
+        searchParams: GenerateCredentialsParams,
         response: z.any()
       }
     });
@@ -228,15 +222,9 @@ export class Aws extends ApiSector {
       client: this.client,
       schema: {
         path: z.object({
-          name: z.string(),
-          isSTS: z.boolean().optional()
+          name: z.string()
         }),
-        searchParams: z.object({
-          role_arn: z.string().optional(),
-          role_session_name: z.string().optional(),
-          ttl: z.string().optional(),
-          mfa_code: z.string().optional()
-        }),
+        body: GenerateCredentialsParams,
         response: z.any()
       }
     });
@@ -322,3 +310,10 @@ export class Aws extends ApiSector {
     });
   }
 }
+
+const GenerateCredentialsParams = z.object({
+  role_arn: z.string().optional(),
+  role_session_name: z.string().optional(),
+  ttl: z.string().optional(),
+  mfa_code: z.string().optional()
+});
