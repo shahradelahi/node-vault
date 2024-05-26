@@ -1,0 +1,29 @@
+name: Wiki
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .wiki/**
+      - .github/workflows/wiki.yml
+
+concurrency:
+  group: publish-wiki
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  publish-wiki:
+    if: github.repository == 'shahradelahi/node-vault'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+      - uses: Andrew-Chen-Wang/github-wiki-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "${{ env.SHORT_SHA }}: ${{ github.event.head_commit.message }}"
+          repository: ${{ github.repository }}
+          path: .wiki
