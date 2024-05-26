@@ -23,7 +23,8 @@
   "scripts": {
     "build": "tsup",
     "test": "mocha \"**/*.test.ts\" --retries 2",
-    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "lint": "pnpm typecheck &&eslint .",
     "lint:fix": "eslint --fix .",
     "format:check": "prettier --check .",
     "format": "prettier --write .",

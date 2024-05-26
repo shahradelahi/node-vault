@@ -3,7 +3,7 @@ import omit from 'lodash.omit';
 import pick from 'lodash.pick';
 import { fetch, type RequestInit } from 'undici';
 import { z } from 'zod';
-import { generateRequest, ZodResponse } from 'zod-request';
+import { generateRequest, ZodRequestInit, ZodResponse } from 'zod-request';
 import { isJson } from './is-json';
 import { removeUndefined } from './object';
 
@@ -16,7 +16,7 @@ export function generateCommand<Schema extends RequestSchema, RawResponse extend
     const { method = 'GET', path, client, schema } = init;
     const { strictSchema = true, ...opts } = options;
 
-    const { url: _url, input } = generateRequest<any, any>(
+    const { url: _url, input } = generateRequest(
       `${client.endpoint}/${client.apiVersion}${client.pathPrefix}${path}`,
       {
         method,
@@ -48,7 +48,7 @@ export function generateCommand<Schema extends RequestSchema, RawResponse extend
           )
         ),
         schema
-      }
+      } as ZodRequestInit<any, any>
     );
 
     const fetcher = init.fetcher || client.fetcher || fetch;
