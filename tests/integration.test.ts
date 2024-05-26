@@ -1,7 +1,7 @@
 import { Client, generateCommand } from '@litehex/node-vault';
-import { createInstance, destroyInstance, sleep } from '@tests/utils';
+import { createInstance, destroyInstance, launchVault, sleep } from '@tests/utils';
 import { expect } from 'chai';
-import { execSync } from 'node:child_process';
+import { ProxyAgent } from 'undici';
 import { z } from 'zod';
 
 describe('node-vault', () => {
@@ -68,7 +68,6 @@ describe('node-vault', () => {
     const status = await vc.sealStatus();
     expect(status).to.have.property('sealed').be.a('boolean').to.be.true;
     expect(status).to.have.property('storage_type').be.a('string').to.be.equal('inmem');
-
     const seal = await vc.seal();
     expect(seal).to.be.true;
 
@@ -109,10 +108,8 @@ describe('node-vault', () => {
   });
 
   it('should init vault', async () => {
-    execSync('docker compose up -d --force-recreate', {
-      stdio: 'ignore'
-    });
-    await sleep(1e3);
+    launchVault();
+    await sleep(1e2);
 
     const vc = new Client();
 
@@ -128,4 +125,15 @@ describe('node-vault', () => {
     expect(result).to.have.property('keys_base64').be.a('array').lengthOf(1);
     expect(result).to.have.property('root_token').be.a('string');
   });
+
+  const { HTTP_PROXY } = process.env;
+  if (HTTP_PROXY) {
+    it('should support proxy', async () => {
+      const agent = new ProxyAgent(HTTP_PROXY);
+
+      const status = await vc.sealStatus(undefined, { dispatcher: agent });
+
+      expect(status).to.have.property('sealed').be.a('boolean');
+    });
+  }
 });
