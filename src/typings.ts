@@ -3,7 +3,7 @@
 import { ClientOptionsSchema } from '@/schema';
 import { RequestInit, Response } from 'undici';
 import type { z } from 'zod';
-import type { RequestSchema as ZodRequestSchema, ZodRequestInit } from 'zod-request';
+import type { RequestSchema as ZodRequestSchema } from 'zod-request';
 
 export type ClientOptions = z.infer<typeof ClientOptionsSchema> & {
   request?: Partial<RequestInit>;
@@ -17,9 +17,9 @@ export type RequestSchema = Omit<ZodRequestSchema, 'path' | 'body'> & {
 
 export type Fetcher = (input: any, init: any) => Promise<any>;
 
-export type ExtendedRequestInit = ZodRequestInit<any, any> & {
+export interface ExtendedRequestInit extends RequestInit {
   strictSchema?: boolean;
-};
+}
 
 type RequestInitWithURL = RequestInit & {
   url: URL;
