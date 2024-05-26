@@ -4,7 +4,7 @@ services:
     container_name: vault
     image: vault:1.13.3
     volumes:
-      - ${PWD}/examples/config.hcl:/vault/config/vault.hcl
+      - ./config.hcl:/vault/config/vault.hcl
     ports:
       - '8200:8200'
       - '8201:8201'

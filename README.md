@@ -1,25 +1,46 @@
-# node-vault
+<div style="text-align: center;">
+<img src="logo.svg" alt="NodeVault Logo" style="width: 100%;max-width: 200px;"/>
+<br/>
+<p>
+<a href="https://github.com/shahradelahi/node-vault/actions/workflows/ci.yml" title="Build status"><img src="https://github.com/shahradelahi/node-vault/actions/workflows/ci.yml/badge.svg" alt="Build status"></a>
+<a href="https://www.npmjs.com/package/@litehex/node-vault" title="NPM Version"><img src="https://img.shields.io/npm/v/@litehex/node-vault" alt="npm"></a>
+<a href="https://libraries.io/npm/@litehex%2Fnode-vault/" title="Dependency Status"><img src="https://img.shields.io/librariesio/release/npm/@litehex%2Fnode-vault.svg" alt="Dependency Status"></a>
+<a href="https://opensource.org/licenses/GPL-3.0" title="License"><img src="https://img.shields.io/badge/License-GPL3.0-blue.svg?style=flat" alt="GPL-3.0 Licensed"></a>
+<br/>
+<a href="https://packagephobia.com/result?p=@litehex/node-vault" title="Install size"><img src="https://packagephobia.com/badge?p=@litehex/node-vault" alt="install size"></a>
+<a href="https://www.npmjs.com/package/@litehex/node-vault" title="Unpacked Size"><img alt="NPM Unpacked Size" src="https://img.shields.io/npm/unpacked-size/%40litehex%2Fnode-vault"></a>
+<a href="https://visitorbadge.io/status?path=https%3A%2F%2Fgithub.com%2Fshahradelahi%2Fnode-vault" title="Visitors"><img src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2Fshahradelahi%2Fnode-vault&amp;countColor=%23263759&amp;style=flat&amp;labelStyle=upper" alt="Visitors"></a>
+</p>
+</div>
 
-> A modern JavaScript client for HashiCorp's Vault with a focus on ease-of-use.
+# Node Vault
 
-[![Build status](https://github.com/shahradelahi/node-vault/actions/workflows/ci.yml/badge.svg)](https://github.com/shahradelahi/node-vault/actions/workflows/ci.yml)
-[![Dependency Status](https://img.shields.io/librariesio/release/npm/@litehex%2Fnode-vault.svg)](https://libraries.io/npm/@litehex%2Fnode-vault/)
-[![npm](https://img.shields.io/npm/v/@litehex/node-vault)](https://www.npmjs.com/package/@litehex/node-vault)
-[![install size](https://packagephobia.com/badge?p=@litehex/node-vault)](https://packagephobia.com/result?p=@litehex/node-vault)
-[![GPL-3.0 Licensed](https://img.shields.io/badge/License-GPL3.0-blue.svg?style=flat)](https://opensource.org/licenses/GPL-3.0)
+> A Modern javascript client for [HashiCorp's Vault](https://developer.hashicorp.com/vault/api-docs) with a focus on ease-of-use.
 
-### Notable features
+---
 
-- Mostly type-safe
-- Highly extendable and configurable
+- [Features](#features)
+- [Installation](#-installation)
+- [Usage](#-usage)
+  - [Init and unseal vault](#init-and-unseal-vault)
+  - [Create Key/Value V2 engine](#create-keyvalue-v2-engine)
+  - [Create, read, update, delete secrets](#write-read-and-delete-secrets)
+- [Documentation](#-documentation)
+- [Contributing](#-contributing)
+- [License](#license)
 
-### 📦 Installation
+## Features
+
+- Typesafe API
+- Extendable by create custom commands
+
+## 📦 Installation
 
 ```bash
 npm install @litehex/node-vault
 ```
 
-### 📖 Usage
+## 📖 Usage
 
 ##### Init and unseal vault
 
@@ -81,9 +102,9 @@ const deleted = await vc.kv2.deleteLatest({ mountPath, path });
 console.log(deleted); // true
 ```
 
-Check out the [examples](/examples) and [tests](/tests) directory for more examples.
-
 ### 📚 Documentation
+
+For complete usages, please dive into the [Wiki](https://github.com/shahradelahi/node-vault/wiki).
 
 For all configuration options, please see [the API docs](https://paka.dev/npm/@litehex/node-vault).
 
