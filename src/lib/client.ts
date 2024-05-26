@@ -64,6 +64,10 @@ class Client {
     return new Kv2(this);
   }
 
+  /**
+   * This property is a POST command that mainly proposed to configure the vault secrets engine.
+   * Also, it can be overridden by you're custom commands inside the client instance.
+   */
   config = generateCommand({
     method: 'POST',
     path: '/{{mountPath}}/config',
@@ -77,6 +81,10 @@ class Client {
     }
   });
 
+  /**
+   * This property is a GET command that resolves an HTTP GET request to the given path. Also, it
+   * can be overridden by you're custom commands inside the client instance.
+   */
   read = generateCommand({
     method: 'GET',
     path: '/{{path}}',
@@ -90,8 +98,8 @@ class Client {
   });
 
   /**
-   * This property is a POST command that sends the `data` parameter as JSON to the given path. It
-   * can be overridden inside the client instance.
+   * This property is a POST command that sends the `data` parameter as JSON to the given path.
+   * Also, it can be overridden by you're custom commands inside the client instance.
    */
   write = generateCommand({
     method: 'POST',
@@ -113,6 +121,10 @@ class Client {
     }
   });
 
+  /**
+   * This property is a DELETE command that resolves an HTTP DELETE request to the given path. Also,
+   * it can be overridden by you're custom commands inside the client instance.
+   */
   delete = generateCommand({
     method: 'DELETE',
     path: '/{{path}}',
@@ -125,6 +137,10 @@ class Client {
     }
   });
 
+  /**
+   * This property is a LIST command that resolves an HTTP GET request to the given path. Also, it
+   * can be overridden by you're custom commands inside the client instance.
+   */
   list = generateCommand({
     method: 'LIST',
     path: '/{{path}}',
