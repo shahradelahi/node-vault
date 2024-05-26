@@ -1,17 +1,17 @@
-<div style="text-align: center;">
-<img src="logo.svg" alt="NodeVault Logo" style="width: 100%;max-width: 200px;"/>
-<br/>
-<p>
+<p align="center">
+<img src="logo.svg" alt="NodeVault Logo" width="200" height="200"/>
+</p>
+<p align="center">
 <a href="https://github.com/shahradelahi/node-vault/actions/workflows/ci.yml" title="Build status"><img src="https://github.com/shahradelahi/node-vault/actions/workflows/ci.yml/badge.svg" alt="Build status"></a>
 <a href="https://www.npmjs.com/package/@litehex/node-vault" title="NPM Version"><img src="https://img.shields.io/npm/v/@litehex/node-vault" alt="npm"></a>
 <a href="https://libraries.io/npm/@litehex%2Fnode-vault/" title="Dependency Status"><img src="https://img.shields.io/librariesio/release/npm/@litehex%2Fnode-vault.svg" alt="Dependency Status"></a>
 <a href="https://opensource.org/licenses/GPL-3.0" title="License"><img src="https://img.shields.io/badge/License-GPL3.0-blue.svg?style=flat" alt="GPL-3.0 Licensed"></a>
-<br/>
+</p>
+<p align="center">
 <a href="https://packagephobia.com/result?p=@litehex/node-vault" title="Install size"><img src="https://packagephobia.com/badge?p=@litehex/node-vault" alt="install size"></a>
 <a href="https://www.npmjs.com/package/@litehex/node-vault" title="Unpacked Size"><img alt="NPM Unpacked Size" src="https://img.shields.io/npm/unpacked-size/%40litehex%2Fnode-vault"></a>
 <a href="https://visitorbadge.io/status?path=https%3A%2F%2Fgithub.com%2Fshahradelahi%2Fnode-vault" title="Visitors"><img src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2Fshahradelahi%2Fnode-vault&amp;countColor=%23263759&amp;style=flat&amp;labelStyle=upper" alt="Visitors"></a>
 </p>
-</div>
 
 # Node Vault
 
