@@ -1,6 +1,7 @@
-import { Client } from '@litehex/node-vault';
-import { createInstance, destroyInstance, sleep } from '@tests/utils';
 import { expect } from 'chai';
+
+import { Client } from '@/index';
+import { createInstance, destroyInstance, sleep } from '@tests/utils';
 
 describe('Key/Value Secrets Engine - Version 1', () => {
   const vc = new Client();
@@ -42,14 +43,14 @@ describe('Key/Value Secrets Engine - Version 1', () => {
       type: 'kv'
     });
 
-    expect(mount).to.true;
+    expect(mount).have.property('data').to.true;
 
     // Verify
     const result = await vc.kv.info({
       mountPath
     });
 
-    expect(result).to.have.property('type', 'kv');
+    expect(result).have.property('data').have.property('type', 'kv');
   });
 
   it('should create a secret path and write a new version', async () => {
@@ -63,8 +64,8 @@ describe('Key/Value Secrets Engine - Version 1', () => {
         foo: 'bar'
       }
     });
-
-    expect(write).not.have.property('errors');
+    expect(write).not.have.property('error');
+    expect(write).have.property('data').be.a('boolean');
 
     // Write new version
     const newWrite = await vc.kv.write({
@@ -74,8 +75,8 @@ describe('Key/Value Secrets Engine - Version 1', () => {
         baz: 'qux'
       }
     });
-
-    expect(newWrite).not.have.property('errors');
+    expect(newWrite).not.have.property('error');
+    expect(newWrite).have.property('data').be.a('boolean');
   });
 
   it('should delete a secret path', async () => {
@@ -91,7 +92,7 @@ describe('Key/Value Secrets Engine - Version 1', () => {
       mountPath,
       path: 'new-test'
     });
-    expect(deleted).to.be.true;
+    expect(deleted).have.property('data').be.true;
   });
 
   it('should be able to read the secret', async () => {
@@ -103,12 +104,13 @@ describe('Key/Value Secrets Engine - Version 1', () => {
       data: { foo: 'bar' }
     });
 
-    const result = await vc.kv.read({
+    const { data, error } = await vc.kv.read({
       mountPath,
       path: 'new-test'
     });
 
-    expect(result).to.have.property('data').to.have.property('foo', 'bar');
+    expect(error).be.undefined;
+    expect(data).have.property('data').have.property('foo', 'bar');
   });
 
   it('should list keys', async () => {
@@ -120,11 +122,11 @@ describe('Key/Value Secrets Engine - Version 1', () => {
       data: { foo: 'bar' }
     });
 
-    const keys = await vc.kv.list({
+    const { data: keys, error } = await vc.kv.list({
       mountPath,
       path: 'deep'
     });
-
-    expect(keys).to.have.property('data').to.have.property('keys').to.include('new-secret');
+    expect(error).be.undefined;
+    expect(keys).have.property('data').have.property('keys').to.include('new-secret');
   });
 });

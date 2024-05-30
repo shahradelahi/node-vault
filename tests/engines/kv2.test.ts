@@ -1,6 +1,8 @@
-import { Client } from '@litehex/node-vault';
-import { createInstance, destroyInstance, sleep } from '@tests/utils';
 import { expect } from 'chai';
+import { expectType } from 'tsd';
+
+import { Client } from '@/index';
+import { createInstance, destroyInstance, sleep } from '@tests/utils';
 
 describe('Key/Value Secrets Engine - Version 2', () => {
   const vc = new Client();
@@ -42,45 +44,45 @@ describe('Key/Value Secrets Engine - Version 2', () => {
       type: 'kv-v2'
     });
 
-    expect(mounted).to.true;
+    expect(mounted).have.property('data').to.true;
 
     // Verify
-    const info = await vc.kv2.info({
+    const { data: info, error } = await vc.kv2.info({
       mountPath
     });
 
-    expect(info).to.have.property('type', 'kv');
-    expect(info).to.have.property('options').to.have.property('version', '2');
+    if (error) {
+      expectType<undefined>(info);
+      return;
+    }
+
+    expectType<undefined>(error);
+    expect(info).have.property('type', 'kv');
+    expect(info).have.property('options').have.property('version', '2');
   });
 
   it('should create a secret path and write a new version', async () => {
     await createEngine();
 
     // Write
-    const write = await vc.kv2.write({
+    const { data: write } = await vc.kv2.write({
       mountPath,
       path: 'new-test',
       data: {
         foo: 'bar'
       }
     });
-
-    expect(write).not.have.property('errors');
-    expect(write).to.have.property('data');
-    expect(write).to.have.property('data').to.have.property('version', 1);
+    expect(write).have.property('data').have.property('version', 1);
 
     // Write new version
-    const newWrite = await vc.kv2.write({
+    const { data: newWrite } = await vc.kv2.write({
       mountPath,
       path: 'new-test',
       data: {
         baz: 'qux'
       }
     });
-
-    expect(newWrite).not.have.property('errors');
-    expect(newWrite).to.have.property('data');
-    expect(newWrite).to.have.property('data').to.have.property('version', 2);
+    expect(newWrite).have.property('data').have.property('version', 2);
   });
 
   it('should delete a version and undelete it', async () => {
@@ -97,14 +99,14 @@ describe('Key/Value Secrets Engine - Version 2', () => {
       path: 'new-test',
       versions: [1]
     });
-    expect(deleted).to.be.true;
+    expect(deleted).have.property('data').be.true;
 
     const undeleted = await vc.kv2.undelete({
       mountPath,
       path: 'new-test',
       versions: [1]
     });
-    expect(undeleted).to.be.true;
+    expect(undeleted).have.property('data').be.true;
   });
 
   it('should be able to read the secret', async () => {
@@ -116,16 +118,13 @@ describe('Key/Value Secrets Engine - Version 2', () => {
       data: { foo: 'bar' }
     });
 
-    const result = await vc.kv2.read({
+    const { data, error } = await vc.kv2.read({
       mountPath,
       path: 'new-test'
     });
-
-    expect(result).to.have.property('data').to.have.property('data').to.have.property('foo', 'bar');
-    expect(result)
-      .to.have.property('data')
-      .to.have.property('metadata')
-      .to.have.property('version', 1);
+    expect(error).be.undefined;
+    expect(data).have.property('data').have.property('data').have.property('foo', 'bar');
+    expect(data).have.property('data').have.property('metadata').have.property('version', 1);
   });
 
   it('should delete the latest version', async () => {
@@ -137,24 +136,25 @@ describe('Key/Value Secrets Engine - Version 2', () => {
       data: { foo: 'bar' }
     });
 
-    const metadata = await vc.kv2.readMetadata({
+    const { data, error } = await vc.kv2.readMetadata({
       mountPath,
       path: 'new-test'
     });
 
-    expect(metadata).to.have.property('data').to.have.property('current_version', 1);
-    expect(metadata).to.have.property('data').to.have.property('custom_metadata');
-    expect(metadata)
-      .to.have.property('data')
-      .to.have.property('versions')
-      .to.have.property('1')
-      .to.have.property('destroyed', false);
+    expect(error).be.undefined;
+    expect(data).have.property('data').have.property('current_version', 1);
+    expect(data).have.property('data').have.property('custom_metadata');
+    expect(data)
+      .have.property('data')
+      .have.property('versions')
+      .have.property('1')
+      .have.property('destroyed', false);
 
     const deleted = await vc.kv2.deleteLatest({
       mountPath,
       path: 'new-test'
     });
-    expect(deleted).to.be.true;
+    expect(deleted).have.property('data').be.true;
   });
 
   it('should write and read metadata', async () => {
@@ -173,7 +173,7 @@ describe('Key/Value Secrets Engine - Version 2', () => {
         foo: 'bar'
       }
     });
-    expect(writeInfo).to.be.true;
+    expect(writeInfo).have.property('data').be.true;
 
     const patchMeta = await vc.kv2.patchMetadata({
       mountPath,
@@ -182,17 +182,21 @@ describe('Key/Value Secrets Engine - Version 2', () => {
         foo: 'baz'
       }
     });
-    expect(patchMeta).to.be.true;
+    expect(patchMeta).have.property('data').be.true;
 
     const metadata = await vc.kv2.readMetadata({
       mountPath,
       path: 'new-test'
     });
-    expect(metadata).to.have.property('data').to.have.property('current_version', 1);
     expect(metadata)
-      .to.have.property('data')
-      .to.have.property('custom_metadata')
-      .to.have.property('foo', 'baz');
+      .have.property('data')
+      .have.property('data')
+      .have.property('current_version', 1);
+    expect(metadata)
+      .have.property('data')
+      .have.property('data')
+      .have.property('custom_metadata')
+      .have.property('foo', 'baz');
   });
 
   it('should delete metadata and all versions', async () => {
@@ -209,7 +213,7 @@ describe('Key/Value Secrets Engine - Version 2', () => {
       path: 'new-test'
     });
 
-    expect(deleted).to.be.true;
+    expect(deleted).have.property('data').be.true;
   });
 
   it('should list keys', async () => {
@@ -226,7 +230,11 @@ describe('Key/Value Secrets Engine - Version 2', () => {
       path: 'deep'
     });
 
-    expect(keys).to.have.property('data').to.have.property('keys').to.include('new-secret');
+    expect(keys)
+      .have.property('data')
+      .have.property('data')
+      .have.property('keys')
+      .to.include('new-secret');
   });
 
   it('should read subkeys', async () => {
@@ -243,7 +251,11 @@ describe('Key/Value Secrets Engine - Version 2', () => {
       path: 'deep/new-secret'
     });
 
-    expect(keys).to.have.property('data').to.have.property('subkeys').to.have.property('foo');
+    expect(keys)
+      .have.property('data')
+      .have.property('data')
+      .have.property('subkeys')
+      .have.property('foo');
   });
 
   it('should read engine config', async () => {
@@ -254,12 +266,12 @@ describe('Key/Value Secrets Engine - Version 2', () => {
       max_versions: 10
     });
 
-    expect(writeConfig).to.be.true;
+    expect(writeConfig).have.property('data').be.true;
 
     const config = await vc.kv2.readConfig({
       mountPath
     });
 
-    expect(config).to.have.property('data').to.have.property('max_versions', 10);
+    expect(config).have.property('data').have.property('data').have.property('max_versions', 10);
   });
 });

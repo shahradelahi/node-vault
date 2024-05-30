@@ -21,9 +21,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@tests/*": ["tests/*"],
-      "@examples/*": ["examples/*"],
-      "@litehex/node-vault": ["src/index.ts"]
+      "@tests/*": ["tests/*"]
     }
   },
   "include": ["**/*.ts"],

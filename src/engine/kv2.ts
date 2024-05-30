@@ -1,7 +1,8 @@
+import { z } from 'zod';
+
 import { generateCommand } from '@/index';
 import { ApiSector } from '@/lib/sector';
-import { ErrorResponseSchema, SuccessResponseSchema, ZodAnyRecord } from '@/schema';
-import { z } from 'zod';
+import { SuccessResponseSchema, ZodAnyRecord } from '@/schema';
 
 export class Kv2 extends ApiSector {
   /**
@@ -23,7 +24,7 @@ export class Kv2 extends ApiSector {
           cas_required: z.boolean().optional(),
           delete_version_after: z.string().optional()
         }),
-        response: z.union([ErrorResponseSchema, z.boolean()])
+        response: z.boolean()
       }
     });
   }
@@ -42,16 +43,13 @@ export class Kv2 extends ApiSector {
         path: z.object({
           mountPath: z.string()
         }),
-        response: z.union([
-          ErrorResponseSchema,
-          SuccessResponseSchema.extend({
-            data: z.object({
-              cas_required: z.boolean(),
-              delete_version_after: z.string(),
-              max_versions: z.number()
-            })
+        response: SuccessResponseSchema.extend({
+          data: z.object({
+            cas_required: z.boolean(),
+            delete_version_after: z.string(),
+            max_versions: z.number()
           })
-        ])
+        })
       }
     });
   }
@@ -74,15 +72,12 @@ export class Kv2 extends ApiSector {
         searchParams: z.object({
           version: z.number().default(0).optional()
         }),
-        response: z.union([
-          ErrorResponseSchema,
-          SuccessResponseSchema.extend({
-            data: z.object({
-              data: z.record(z.string()),
-              metadata: MetadataSchema
-            })
+        response: SuccessResponseSchema.extend({
+          data: z.object({
+            data: z.record(z.string()),
+            metadata: MetadataSchema
           })
-        ])
+        })
       }
     });
   }
@@ -106,12 +101,9 @@ export class Kv2 extends ApiSector {
           data: z.record(z.any()).default({}),
           options: PostOptionsSchema.default({}).optional()
         }),
-        response: z.union([
-          ErrorResponseSchema,
-          SuccessResponseSchema.extend({
-            data: MetadataSchema
-          })
-        ])
+        response: SuccessResponseSchema.extend({
+          data: MetadataSchema
+        })
       }
     });
   }
@@ -167,15 +159,12 @@ export class Kv2 extends ApiSector {
           version: z.number().optional(),
           depth: z.number().optional()
         }),
-        response: z.union([
-          ErrorResponseSchema,
-          SuccessResponseSchema.extend({
-            data: z.object({
-              metadata: MetadataSchema,
-              subkeys: z.record(z.any())
-            })
+        response: SuccessResponseSchema.extend({
+          data: z.object({
+            metadata: MetadataSchema,
+            subkeys: z.record(z.any())
           })
-        ])
+        })
       }
     });
   }
@@ -195,7 +184,7 @@ export class Kv2 extends ApiSector {
           mountPath: z.string(),
           path: z.string()
         }),
-        response: z.union([ErrorResponseSchema, z.boolean()])
+        response: z.boolean()
       }
     });
   }
@@ -218,7 +207,7 @@ export class Kv2 extends ApiSector {
         body: z.object({
           versions: z.array(z.number())
         }),
-        response: z.union([ErrorResponseSchema, z.boolean()])
+        response: z.boolean()
       }
     });
   }
@@ -241,7 +230,7 @@ export class Kv2 extends ApiSector {
         body: z.object({
           versions: z.array(z.number())
         }),
-        response: z.union([ErrorResponseSchema, z.boolean()])
+        response: z.boolean()
       }
     });
   }
@@ -264,7 +253,7 @@ export class Kv2 extends ApiSector {
         body: z.object({
           versions: z.array(z.number())
         }),
-        response: z.union([ErrorResponseSchema, z.boolean()])
+        response: z.boolean()
       }
     });
   }
@@ -284,14 +273,11 @@ export class Kv2 extends ApiSector {
           mountPath: z.string(),
           path: z.string()
         }),
-        response: z.union([
-          ErrorResponseSchema,
-          SuccessResponseSchema.extend({
-            data: z.object({
-              keys: z.array(z.string())
-            })
+        response: SuccessResponseSchema.extend({
+          data: z.object({
+            keys: z.array(z.string())
           })
-        ])
+        })
       }
     });
   }
@@ -311,28 +297,25 @@ export class Kv2 extends ApiSector {
           mountPath: z.string(),
           path: z.string()
         }),
-        response: z.union([
-          ErrorResponseSchema,
-          SuccessResponseSchema.extend({
-            data: z.object({
-              cas_required: z.boolean(),
-              created_time: z.string(),
-              current_version: z.number(),
-              custom_metadata: z.record(z.string()).nullable(),
-              delete_version_after: z.string(),
-              max_versions: z.number(),
-              oldest_version: z.number(),
-              updated_time: z.string(),
-              versions: z.record(
-                z.object({
-                  created_time: z.string(),
-                  deletion_time: z.string(),
-                  destroyed: z.boolean()
-                })
-              )
-            })
+        response: SuccessResponseSchema.extend({
+          data: z.object({
+            cas_required: z.boolean(),
+            created_time: z.string(),
+            current_version: z.number(),
+            custom_metadata: z.record(z.string()).nullable(),
+            delete_version_after: z.string(),
+            max_versions: z.number(),
+            oldest_version: z.number(),
+            updated_time: z.string(),
+            versions: z.record(
+              z.object({
+                created_time: z.string(),
+                deletion_time: z.string(),
+                destroyed: z.boolean()
+              })
+            )
           })
-        ])
+        })
       }
     });
   }
@@ -353,7 +336,7 @@ export class Kv2 extends ApiSector {
           path: z.string()
         }),
         body: MetadataRequestBodySchema,
-        response: z.union([ErrorResponseSchema, z.boolean()])
+        response: z.boolean()
       }
     });
   }
@@ -380,7 +363,7 @@ export class Kv2 extends ApiSector {
           path: z.string()
         }),
         body: MetadataRequestBodySchema,
-        response: z.union([ErrorResponseSchema, z.boolean()])
+        response: z.boolean()
       }
     });
   }
@@ -400,7 +383,7 @@ export class Kv2 extends ApiSector {
           mountPath: z.string(),
           path: z.string()
         }),
-        response: z.union([ErrorResponseSchema, z.boolean()])
+        response: z.boolean()
       }
     });
   }
@@ -417,46 +400,44 @@ export class Kv2 extends ApiSector {
         path: z.object({
           mountPath: z.string()
         }),
-        response: ErrorResponseSchema.or(
-          SuccessResponseSchema.extend({
-            local: z.boolean(),
-            seal_wrap: z.boolean(),
-            external_entropy_access: z.boolean(),
-            options: ZodAnyRecord,
-            running_sha256: z.string(),
-            deprecation_status: z.string(),
+        response: SuccessResponseSchema.extend({
+          local: z.boolean(),
+          seal_wrap: z.boolean(),
+          external_entropy_access: z.boolean(),
+          options: ZodAnyRecord,
+          running_sha256: z.string(),
+          deprecation_status: z.string(),
+          config: z.object({
+            default_lease_ttl: z.number(),
+            force_no_cache: z.boolean(),
+            max_lease_ttl: z.number()
+          }),
+          type: z.string(),
+          description: z.string(),
+          accessor: z.string(),
+          uuid: z.string(),
+          plugin_version: z.string(),
+          running_plugin_version: z.string(),
+          data: z.object({
+            accessor: z.string(),
             config: z.object({
               default_lease_ttl: z.number(),
               force_no_cache: z.boolean(),
               max_lease_ttl: z.number()
             }),
-            type: z.string(),
+            deprecation_status: z.string(),
             description: z.string(),
-            accessor: z.string(),
-            uuid: z.string(),
+            external_entropy_access: z.boolean(),
+            local: z.boolean(),
+            options: ZodAnyRecord,
             plugin_version: z.string(),
             running_plugin_version: z.string(),
-            data: z.object({
-              accessor: z.string(),
-              config: z.object({
-                default_lease_ttl: z.number(),
-                force_no_cache: z.boolean(),
-                max_lease_ttl: z.number()
-              }),
-              deprecation_status: z.string(),
-              description: z.string(),
-              external_entropy_access: z.boolean(),
-              local: z.boolean(),
-              options: ZodAnyRecord,
-              plugin_version: z.string(),
-              running_plugin_version: z.string(),
-              running_sha256: z.string(),
-              seal_wrap: z.boolean(),
-              type: z.string(),
-              uuid: z.string()
-            })
+            running_sha256: z.string(),
+            seal_wrap: z.boolean(),
+            type: z.string(),
+            uuid: z.string()
           })
-        )
+        })
       }
     });
   }

@@ -1,6 +1,7 @@
-import { ApiSector } from '@/lib/sector';
-import { generateCommand } from '@litehex/node-vault';
 import { z } from 'zod';
+
+import { ApiSector } from '@/lib/sector';
+import { generateCommand } from '@/utils/generate-command';
 
 /**
  * AWS secrets engine (API)

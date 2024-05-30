@@ -1,7 +1,8 @@
-import { ApiSector } from '@/lib/sector';
-import { ErrorResponseSchema, SuccessResponseSchema, ZodAnyRecord } from '@/schema';
-import { generateCommand } from '@litehex/node-vault';
 import { z } from 'zod';
+
+import { ApiSector } from '@/lib/sector';
+import { SuccessResponseSchema, ZodAnyRecord } from '@/schema';
+import { generateCommand } from '@/utils/generate-command';
 
 /**
  * KV secrets engine - version 1
@@ -24,11 +25,9 @@ export class Kv extends ApiSector {
           mountPath: z.string(),
           path: z.string()
         }),
-        response: ErrorResponseSchema.or(
-          SuccessResponseSchema.extend({
-            data: ZodAnyRecord
-          })
-        )
+        response: SuccessResponseSchema.extend({
+          data: ZodAnyRecord
+        })
       }
     });
   }
@@ -48,13 +47,11 @@ export class Kv extends ApiSector {
           mountPath: z.string(),
           path: z.string()
         }),
-        response: ErrorResponseSchema.or(
-          SuccessResponseSchema.extend({
-            data: z.object({
-              keys: z.array(z.string())
-            })
+        response: SuccessResponseSchema.extend({
+          data: z.object({
+            keys: z.array(z.string())
           })
-        )
+        })
       }
     });
   }
@@ -81,7 +78,7 @@ export class Kv extends ApiSector {
         body: z.object({
           data: ZodAnyRecord
         }),
-        response: ErrorResponseSchema.or(z.boolean())
+        response: z.boolean()
       },
       refine: (init) => {
         // Flat the body.data
@@ -106,7 +103,7 @@ export class Kv extends ApiSector {
           mountPath: z.string(),
           path: z.string()
         }),
-        response: ErrorResponseSchema.or(z.boolean())
+        response: z.boolean()
       }
     });
   }
@@ -123,46 +120,44 @@ export class Kv extends ApiSector {
         path: z.object({
           mountPath: z.string()
         }),
-        response: ErrorResponseSchema.or(
-          SuccessResponseSchema.extend({
-            deprecation_status: z.string(),
-            type: z.string(),
-            description: z.string(),
-            seal_wrap: z.boolean(),
-            options: ZodAnyRecord,
-            running_plugin_version: z.string(),
-            running_sha256: z.string(),
+        response: SuccessResponseSchema.extend({
+          deprecation_status: z.string(),
+          type: z.string(),
+          description: z.string(),
+          seal_wrap: z.boolean(),
+          options: ZodAnyRecord,
+          running_plugin_version: z.string(),
+          running_sha256: z.string(),
+          config: z.object({
+            default_lease_ttl: z.number(),
+            force_no_cache: z.boolean(),
+            max_lease_ttl: z.number()
+          }),
+          accessor: z.string(),
+          local: z.boolean(),
+          external_entropy_access: z.boolean(),
+          uuid: z.string(),
+          plugin_version: z.string(),
+          data: z.object({
+            accessor: z.string(),
             config: z.object({
               default_lease_ttl: z.number(),
               force_no_cache: z.boolean(),
               max_lease_ttl: z.number()
             }),
-            accessor: z.string(),
-            local: z.boolean(),
+            deprecation_status: z.string(),
+            description: z.string(),
             external_entropy_access: z.boolean(),
-            uuid: z.string(),
+            local: z.boolean(),
+            options: ZodAnyRecord,
             plugin_version: z.string(),
-            data: z.object({
-              accessor: z.string(),
-              config: z.object({
-                default_lease_ttl: z.number(),
-                force_no_cache: z.boolean(),
-                max_lease_ttl: z.number()
-              }),
-              deprecation_status: z.string(),
-              description: z.string(),
-              external_entropy_access: z.boolean(),
-              local: z.boolean(),
-              options: ZodAnyRecord,
-              plugin_version: z.string(),
-              running_plugin_version: z.string(),
-              running_sha256: z.string(),
-              seal_wrap: z.boolean(),
-              type: z.string(),
-              uuid: z.string()
-            })
+            running_plugin_version: z.string(),
+            running_sha256: z.string(),
+            seal_wrap: z.boolean(),
+            type: z.string(),
+            uuid: z.string()
           })
-        )
+        })
       }
     });
   }

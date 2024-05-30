@@ -23,10 +23,6 @@ export const EngineInfoSchema = z.object({
   uuid: z.string()
 });
 
-export const ErrorResponseSchema = z.object({
-  errors: z.array(z.string())
-});
-
 export const SuccessResponseSchema = z.object({
   request_id: z.string(),
   lease_id: z.string(),
@@ -36,8 +32,6 @@ export const SuccessResponseSchema = z.object({
   warnings: z.record(z.any()).nullable(),
   auth: z.record(z.any()).nullable()
 });
-
-export const ApiResponseSchema = ErrorResponseSchema.or(z.record(z.any()));
 
 export const ClientOptionsSchema = z.object({
   endpoint: z.string().optional(),
