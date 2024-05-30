@@ -10,7 +10,7 @@ import {
   SuccessResponseSchema,
   ZodAnyRecord
 } from '@/schema';
-import { ClientOptions } from '@/typings';
+import { ClientOptions, Fetcher } from '@/typings';
 import { generateCommand } from '@litehex/node-vault';
 import type { RequestInit } from 'undici';
 import { z } from 'zod';
@@ -22,9 +22,10 @@ class Client {
   namespace: string | undefined;
   token: string | undefined;
   request: Partial<Omit<RequestInit, 'url'>> | undefined;
+  fetcher: Fetcher | undefined;
 
   constructor(protected opts: ClientOptions = {}) {
-    const { request, ...restOpts } = opts;
+    const { request, fetcher, ...restOpts } = opts;
     const options = ClientOptionsSchema.parse(restOpts);
 
     this.endpoint = options.endpoint || process.env.VAULT_ADDR || 'http://127.0.0.1:8200';
@@ -33,6 +34,7 @@ class Client {
     this.namespace = options.namespace || process.env.VAULT_NAMESPACE;
     this.token = options.token || process.env.VAULT_TOKEN;
 
+    this.fetcher = fetcher;
     this.request = request;
   }
 
