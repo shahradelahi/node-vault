@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
+import { VaultError } from '@/errors';
 import { ClientOptionsSchema } from '@/schema';
+import { SafeReturn } from 'p-safe';
 import { RequestInit, Response } from 'undici';
 import type { z } from 'zod';
 import type { RequestSchema as ZodRequestSchema } from 'zod-request';
@@ -54,9 +56,12 @@ export type CommandFn<Schema extends RequestSchema, RawResponse extends boolean 
   args?: CommandArgs<Schema>,
   options?: Omit<ExtendedRequestInit, 'url'>
 ) => Promise<
-  RawResponse extends true
-    ? Response
-    : Schema['response'] extends z.ZodType
-      ? z.infer<Schema['response']>
-      : unknown
+  SafeReturn<
+    RawResponse extends true
+      ? Response
+      : Schema['response'] extends z.ZodType
+        ? z.infer<Schema['response']>
+        : unknown,
+    VaultError
+  >
 >;

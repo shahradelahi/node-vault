@@ -24,7 +24,7 @@
     "build": "tsup",
     "test": "mocha \"**/*.test.ts\" --retries 2",
     "typecheck": "tsc --noEmit",
-    "lint": "pnpm typecheck &&eslint .",
+    "lint": "pnpm typecheck && eslint .",
     "lint:fix": "eslint --fix .",
     "format:check": "prettier --check .",
     "format": "prettier --write .",
@@ -35,6 +35,7 @@
   "dependencies": {
     "lodash.omit": "^4.5.0",
     "lodash.pick": "^4.4.0",
+    "p-safe": "^1.0.0",
     "undici": "^6.14.1",
     "zod": "^3.23.4",
     "zod-request": "^0.2.2"
@@ -53,6 +54,7 @@
     "eslint": "^8.57.0",
     "mocha": "^10.4.0",
     "prettier": "^3.2.5",
+    "tsd": "^0.31.0",
     "tsup": "^8.0.2",
     "tsx": "^4.7.3",
     "typescript": "^5.4.5"

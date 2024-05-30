@@ -3,10 +3,8 @@ import { Kubernetes } from '@/engine/kubernetes';
 import { Kv } from '@/engine/kv';
 import { Kv2 } from '@/engine/kv2';
 import {
-  ApiResponseSchema,
   ClientOptionsSchema,
   EngineInfoSchema,
-  ErrorResponseSchema,
   SuccessResponseSchema,
   ZodAnyRecord
 } from '@/schema';
@@ -95,7 +93,7 @@ class Client {
       path: z.object({
         path: z.string()
       }),
-      response: z.union([ErrorResponseSchema, z.record(z.any())])
+      response: ZodAnyRecord
     }
   });
 
@@ -114,7 +112,7 @@ class Client {
       body: z.object({
         data: ZodAnyRecord
       }),
-      response: z.union([ErrorResponseSchema, z.record(z.any()), z.boolean()])
+      response: z.union([ZodAnyRecord, z.boolean()])
     },
     refine: (init) => {
       // Flatten the body.data
@@ -135,7 +133,7 @@ class Client {
       path: z.object({
         path: z.string()
       }),
-      response: z.union([ErrorResponseSchema, z.boolean()])
+      response: z.boolean()
     }
   });
 
@@ -151,7 +149,7 @@ class Client {
       path: z.object({
         path: z.string()
       }),
-      response: z.union([ErrorResponseSchema, z.record(z.any())])
+      response: ZodAnyRecord
     }
   });
 
@@ -170,17 +168,15 @@ class Client {
       path: '/sys/audit',
       client: this,
       schema: {
-        response: ErrorResponseSchema.or(
-          SuccessResponseSchema.extend({
-            data: z.record(
-              z.object({
-                type: z.string(),
-                description: z.string(),
-                options: z.record(z.any())
-              })
-            )
-          })
-        )
+        response: SuccessResponseSchema.extend({
+          data: z.record(
+            z.object({
+              type: z.string(),
+              description: z.string(),
+              options: z.record(z.any())
+            })
+          )
+        })
       }
     });
   }
@@ -199,7 +195,7 @@ class Client {
         path: z.object({
           path: z.string()
         }),
-        response: ErrorResponseSchema.or(z.boolean())
+        response: z.boolean()
       }
     });
   }
@@ -218,7 +214,7 @@ class Client {
         path: z.object({
           path: z.string()
         }),
-        response: ErrorResponseSchema.or(z.boolean())
+        response: z.boolean()
       }
     });
   }
@@ -242,7 +238,7 @@ class Client {
           token: z.string(),
           paths: z.array(z.string())
         }),
-        response: ErrorResponseSchema.or(z.boolean())
+        response: z.boolean()
       }
     });
   }
@@ -258,22 +254,20 @@ class Client {
       path: '/sys/seal-status',
       client: this,
       schema: {
-        response: ErrorResponseSchema.or(
-          z.object({
-            type: z.string(),
-            initialized: z.boolean(),
-            sealed: z.boolean(),
-            t: z.number(),
-            n: z.number(),
-            progress: z.number(),
-            nonce: z.string(),
-            version: z.string(),
-            build_date: z.string(),
-            migration: z.boolean(),
-            recovery_seal: z.boolean(),
-            storage_type: z.string()
-          })
-        )
+        response: z.object({
+          type: z.string(),
+          initialized: z.boolean(),
+          sealed: z.boolean(),
+          t: z.number(),
+          n: z.number(),
+          progress: z.number(),
+          nonce: z.string(),
+          version: z.string(),
+          build_date: z.string(),
+          migration: z.boolean(),
+          recovery_seal: z.boolean(),
+          storage_type: z.string()
+        })
       }
     });
   }
@@ -342,26 +336,23 @@ class Client {
           reset: z.boolean().default(false).optional(),
           migrate: z.boolean().default(false).optional()
         }),
-        response: z.union([
-          ErrorResponseSchema,
-          z.discriminatedUnion('sealed', [
-            z.object({
-              sealed: z.literal(true),
-              t: z.number(),
-              n: z.number(),
-              progress: z.number(),
-              version: z.string()
-            }),
-            z.object({
-              sealed: z.literal(false),
-              t: z.number(),
-              n: z.number(),
-              progress: z.number(),
-              version: z.string(),
-              cluster_name: z.string(),
-              cluster_id: z.string()
-            })
-          ])
+        response: z.discriminatedUnion('sealed', [
+          z.object({
+            sealed: z.literal(true),
+            t: z.number(),
+            n: z.number(),
+            progress: z.number(),
+            version: z.string()
+          }),
+          z.object({
+            sealed: z.literal(false),
+            t: z.number(),
+            n: z.number(),
+            progress: z.number(),
+            version: z.string(),
+            cluster_name: z.string(),
+            cluster_id: z.string()
+          })
         ])
       }
     });
@@ -378,7 +369,7 @@ class Client {
       path: '/sys/seal',
       client: this,
       schema: {
-        response: z.union([ErrorResponseSchema, z.boolean()])
+        response: z.boolean()
       }
     });
   }
@@ -563,7 +554,7 @@ class Client {
         path: z.object({
           mountPath: z.string()
         }),
-        response: ApiResponseSchema
+        response: ZodAnyRecord
       }
     });
   }
@@ -582,14 +573,11 @@ class Client {
         path: z.object({
           mountPath: z.string()
         }),
-        response: z.union([
-          ErrorResponseSchema,
-          z.object({
-            default_lease_ttl: z.number(),
-            max_lease_ttl: z.number(),
-            force_no_cache: z.boolean()
-          })
-        ])
+        response: z.object({
+          default_lease_ttl: z.number(),
+          max_lease_ttl: z.number(),
+          force_no_cache: z.boolean()
+        })
       }
     });
   }
@@ -620,7 +608,7 @@ class Client {
           allowed_managed_keys: z.array(z.string()).optional(),
           plugin_version: z.string().optional()
         }),
-        response: ApiResponseSchema
+        response: ZodAnyRecord
       }
     });
   }
@@ -636,20 +624,18 @@ class Client {
       path: '/sys/health',
       client: this,
       schema: {
-        response: ErrorResponseSchema.or(
-          z.object({
-            initialized: z.boolean(),
-            sealed: z.boolean(),
-            standby: z.boolean(),
-            performance_standby: z.boolean(),
-            replication_performance_mode: z.string(),
-            replication_dr_mode: z.string(),
-            server_time_utc: z.number(),
-            version: z.string(),
-            cluster_name: z.string(),
-            cluster_id: z.string()
-          })
-        )
+        response: z.object({
+          initialized: z.boolean(),
+          sealed: z.boolean(),
+          standby: z.boolean(),
+          performance_standby: z.boolean(),
+          replication_performance_mode: z.string(),
+          replication_dr_mode: z.string(),
+          server_time_utc: z.number(),
+          version: z.string(),
+          cluster_name: z.string(),
+          cluster_id: z.string()
+        })
       }
     });
   }
@@ -665,111 +651,109 @@ class Client {
       path: '/sys/host-info',
       client: this,
       schema: {
-        response: ErrorResponseSchema.or(
-          SuccessResponseSchema.extend({
-            data: z.object({
-              cpu: z.array(
-                z.object({
-                  cpu: z.number(),
-                  vendorId: z.string(),
-                  family: z.string(),
-                  model: z.string(),
-                  stepping: z.number(),
-                  physicalId: z.string(),
-                  coreId: z.string(),
-                  cores: z.number(),
-                  modelName: z.string(),
-                  mhz: z.number(),
-                  cacheSize: z.number(),
-                  flags: z.array(z.string()),
-                  microcode: z.string()
-                })
-              ),
-              cpu_times: z.array(
-                z.object({
-                  cpu: z.string(),
-                  user: z.number(),
-                  system: z.number(),
-                  idle: z.number(),
-                  nice: z.number(),
-                  iowait: z.number(),
-                  irq: z.number(),
-                  softirq: z.number(),
-                  steal: z.number(),
-                  guest: z.number(),
-                  guestNice: z.number()
-                })
-              ),
-              disk: z.array(
-                z.object({
-                  path: z.string(),
-                  fstype: z.string(),
-                  total: z.number(),
-                  free: z.number(),
-                  used: z.number(),
-                  usedPercent: z.number(),
-                  inodesTotal: z.number(),
-                  inodesUsed: z.number(),
-                  inodesFree: z.number(),
-                  inodesUsedPercent: z.number()
-                })
-              ),
-              host: z.object({
-                hostname: z.string(),
-                uptime: z.number(),
-                bootTime: z.number(),
-                procs: z.number(),
-                os: z.string(),
-                platform: z.string(),
-                platformFamily: z.string(),
-                platformVersion: z.string(),
-                kernelVersion: z.string(),
-                kernelArch: z.string(),
-                virtualizationSystem: z.string(),
-                virtualizationRole: z.string(),
-                hostid: z.string()
-              }),
-              memory: z.object({
+        response: SuccessResponseSchema.extend({
+          data: z.object({
+            cpu: z.array(
+              z.object({
+                cpu: z.number(),
+                vendorId: z.string(),
+                family: z.string(),
+                model: z.string(),
+                stepping: z.number(),
+                physicalId: z.string(),
+                coreId: z.string(),
+                cores: z.number(),
+                modelName: z.string(),
+                mhz: z.number(),
+                cacheSize: z.number(),
+                flags: z.array(z.string()),
+                microcode: z.string()
+              })
+            ),
+            cpu_times: z.array(
+              z.object({
+                cpu: z.string(),
+                user: z.number(),
+                system: z.number(),
+                idle: z.number(),
+                nice: z.number(),
+                iowait: z.number(),
+                irq: z.number(),
+                softirq: z.number(),
+                steal: z.number(),
+                guest: z.number(),
+                guestNice: z.number()
+              })
+            ),
+            disk: z.array(
+              z.object({
+                path: z.string(),
+                fstype: z.string(),
                 total: z.number(),
-                available: z.number(),
+                free: z.number(),
                 used: z.number(),
                 usedPercent: z.number(),
-                free: z.number(),
-                active: z.number(),
-                inactive: z.number(),
-                wired: z.number(),
-                laundry: z.number(),
-                buffers: z.number(),
-                cached: z.number(),
-                writeback: z.number(),
-                dirty: z.number(),
-                writebacktmp: z.number(),
-                shared: z.number(),
-                slab: z.number(),
-                sreclaimable: z.number(),
-                sunreclaim: z.number(),
-                pagetables: z.number(),
-                swapcached: z.number(),
-                commitlimit: z.number(),
-                committedas: z.number(),
-                hightotal: z.number(),
-                highfree: z.number(),
-                lowtotal: z.number(),
-                lowfree: z.number(),
-                swaptotal: z.number(),
-                swapfree: z.number(),
-                mapped: z.number(),
-                vmalloctotal: z.number(),
-                vmallocused: z.number(),
-                vmallocchunk: z.number(),
-                hugepagestotal: z.number(),
-                hugepagesfree: z.number(),
-                hugepagesize: z.number()
-              }),
-              timestamp: z.string()
-            })
+                inodesTotal: z.number(),
+                inodesUsed: z.number(),
+                inodesFree: z.number(),
+                inodesUsedPercent: z.number()
+              })
+            ),
+            host: z.object({
+              hostname: z.string(),
+              uptime: z.number(),
+              bootTime: z.number(),
+              procs: z.number(),
+              os: z.string(),
+              platform: z.string(),
+              platformFamily: z.string(),
+              platformVersion: z.string(),
+              kernelVersion: z.string(),
+              kernelArch: z.string(),
+              virtualizationSystem: z.string(),
+              virtualizationRole: z.string(),
+              hostid: z.string()
+            }),
+            memory: z.object({
+              total: z.number(),
+              available: z.number(),
+              used: z.number(),
+              usedPercent: z.number(),
+              free: z.number(),
+              active: z.number(),
+              inactive: z.number(),
+              wired: z.number(),
+              laundry: z.number(),
+              buffers: z.number(),
+              cached: z.number(),
+              writeback: z.number(),
+              dirty: z.number(),
+              writebacktmp: z.number(),
+              shared: z.number(),
+              slab: z.number(),
+              sreclaimable: z.number(),
+              sunreclaim: z.number(),
+              pagetables: z.number(),
+              swapcached: z.number(),
+              commitlimit: z.number(),
+              committedas: z.number(),
+              hightotal: z.number(),
+              highfree: z.number(),
+              lowtotal: z.number(),
+              lowfree: z.number(),
+              swaptotal: z.number(),
+              swapfree: z.number(),
+              mapped: z.number(),
+              vmalloctotal: z.number(),
+              vmallocused: z.number(),
+              vmallocchunk: z.number(),
+              hugepagestotal: z.number(),
+              hugepagesfree: z.number(),
+              hugepagesize: z.number()
+            }),
+            timestamp: z.string()
           })
-        )
+        })
       }
     });
   }

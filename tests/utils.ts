@@ -16,17 +16,17 @@ export async function createInstance(unsealed: boolean = true): Promise<{
   root_token: string;
 }> {
   launchVault();
-  await sleep(2000);
+  await sleep(3000);
 
   const vc = new Client();
 
-  const resp = await vc.init({
+  const { data, error } = await vc.init({
     secret_shares: 1,
     secret_threshold: 1
   });
-  expect(resp).not.have.property('errors');
+  expect(error, error?.message).be.be.undefined;
 
-  const { keys, root_token } = resp as any;
+  const { keys, root_token } = data!;
 
   await sleep(2000);
 
