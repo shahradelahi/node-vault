@@ -1,5 +1,11 @@
 # @litehex/node-vault
 
+## 0.2.5
+
+### Patch Changes
+
+- 9f41e99: fix: the `fetcher` parameter was not being assigned to the client
+
 ## 0.2.4
 
 ### Patch Changes
