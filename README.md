@@ -1,21 +1,18 @@
 <p align="center">
 <img src="logo.svg" alt="NodeVault Logo" width="200" height="200"/>
 </p>
-<p align="center">
+<h1 align="center">
+<sup>Node Vault</sup>
+<br>
 <a href="https://github.com/shahradelahi/node-vault/actions/workflows/ci.yml" title="Build status"><img src="https://github.com/shahradelahi/node-vault/actions/workflows/ci.yml/badge.svg" alt="Build status"></a>
 <a href="https://www.npmjs.com/package/@litehex/node-vault" title="NPM Version"><img src="https://img.shields.io/npm/v/@litehex/node-vault" alt="npm"></a>
-<a href="https://libraries.io/npm/@litehex%2Fnode-vault/" title="Dependency Status"><img src="https://img.shields.io/librariesio/release/npm/@litehex%2Fnode-vault.svg" alt="Dependency Status"></a>
-<a href="https://opensource.org/licenses/GPL-3.0" title="License"><img src="https://img.shields.io/badge/License-GPL3.0-blue.svg?style=flat" alt="GPL-3.0 Licensed"></a>
-</p>
-<p align="center">
-<a href="https://packagephobia.com/result?p=@litehex/node-vault" title="Install size"><img src="https://packagephobia.com/badge?p=@litehex/node-vault" alt="install size"></a>
-<a href="https://www.npmjs.com/package/@litehex/node-vault" title="Unpacked Size"><img alt="NPM Unpacked Size" src="https://img.shields.io/npm/unpacked-size/%40litehex%2Fnode-vault"></a>
 <a href="https://www.npmjs.com/package/@litehex/node-vault" title="Downloads"><img alt="NPM Downloads" src="https://img.shields.io/npm/dm/@litehex%2Fnode-vault.svg"></a>
-</p>
+<a href="https://opensource.org/licenses/GPL-3.0" title="License"><img src="https://img.shields.io/badge/License-GPL3.0-blue.svg?style=flat" alt="GPL-3.0 Licensed"></a>
+</h1>
 
-# Node Vault
-
-> A Modern javascript client for [HashiCorp's Vault](https://developer.hashicorp.com/vault/api-docs) with a focus on ease-of-use.
+_node-vault_ is a Javascript HTTP client for [HashiCorp's Vault](https://developer.hashicorp.com/vault/api-docs) API
+that allows you tyo have typesafe access to the API using [TypeScript](https://www.typescriptlang.org/)
+and [Zod](https://github.com/colinhacks/zod).
 
 ---
 
@@ -31,8 +28,8 @@
 
 ## Features
 
-- Typesafe API
-- Extendable by create custom commands
+- Typesafe and Validated API
+- Extendable using Custom Commands
 
 ## 📦 Installation
 
@@ -53,10 +50,10 @@ const vc = new Client({
   endpoint: 'http://127.0.0.1:8200', // default
   token: 'hv.xxxxxxxxxxxxxxxxxxxxx' // Optional in case you want to initialize the vault
 });
-
+// { data: xxx }
 // Init vault
 const init = await vc.init({ secret_shares: 1, secret_threshold: 1 });
-console.log(init); // { keys: [ ... ], keys_base64: [ ... ], ... }
+console.log(init); // { data: { keys: [ ... ], keys_base64: [ ... ], ... } }
 
 // Set token
 const { keys, root_token } = init;
@@ -64,7 +61,7 @@ vc.token = root_token;
 
 const unsealed = await vc.unseal({ key: keys[0] });
 
-console.log(unsealed); // { type: 'shamir', initialized: true, sealed: false, ... }
+console.log(unsealed); // { data: { type: 'shamir', initialized: true, sealed: false, ... } }
 ```
 
 ##### Create Key/Value V2 engine
@@ -79,7 +76,7 @@ console.log(mounted); // true
 
 const info = await vc.engineInfo({ mountPath: 'my-secret' });
 
-console.log(info); // { type: 'kv', options: { version: '2' }, ... }
+console.log(info); // { data: { type: 'kv', options: { version: '2' }, ... } }
 ```
 
 ##### Write, read and delete secrets
@@ -93,13 +90,13 @@ const write = await vc.kv2.write({
   path,
   data: { foo: 'bar' }
 });
-console.log(write); // { request_id: '...', lease_id: '...', ... }
+console.log(write); // { data: { request_id: '...', lease_id: '...', ... } }
 
 const read = await vc.kv2.read({ mountPath, path });
-console.log(read); // { request_id: '...', lease_id: '...', ... }
+console.log(read); // { data: { request_id: '...', lease_id: '...', ... } }
 
 const deleted = await vc.kv2.deleteLatest({ mountPath, path });
-console.log(deleted); // true
+console.log(deleted); // { data: true }
 ```
 
 ### 📚 Documentation

@@ -39,7 +39,7 @@ const status = generateCommand({
   }
 });
 
-await status({ 'X-Zone': 'foo' });
+await status({ 'X-Zone': 'foo' }); // { data, error }
 ```
 
 If you do not understand how you must write your command, please refer
