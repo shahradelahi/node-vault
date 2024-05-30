@@ -10,7 +10,7 @@
 <p align="center">
 <a href="https://packagephobia.com/result?p=@litehex/node-vault" title="Install size"><img src="https://packagephobia.com/badge?p=@litehex/node-vault" alt="install size"></a>
 <a href="https://www.npmjs.com/package/@litehex/node-vault" title="Unpacked Size"><img alt="NPM Unpacked Size" src="https://img.shields.io/npm/unpacked-size/%40litehex%2Fnode-vault"></a>
-<a href="https://visitorbadge.io/status?path=https%3A%2F%2Fgithub.com%2Fshahradelahi%2Fnode-vault" title="Visitors"><img src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2Fshahradelahi%2Fnode-vault&amp;countColor=%23263759&amp;style=flat&amp;labelStyle=upper" alt="Visitors"></a>
+<a href="https://www.npmjs.com/package/@litehex/node-vault" title="Downloads"><img alt="NPM Downloads" src="https://img.shields.io/npm/dm/@litehex%2Fnode-vault.svg"></a>
 </p>
 
 # Node Vault
