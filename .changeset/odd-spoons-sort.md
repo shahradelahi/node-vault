@@ -2,7 +2,7 @@
 "@litehex/node-vault": major
 ---
 
-BREAKING: The responses are wrapped in a record which is typeof `SafeReturn<T, VaultError>` and this record contains the `data` property for success responses and the `error` property for error responses.
+BREAKING: The responses are wrapped in a record of type `SafeReturn<T, VaultError>`. This record contains the `data` property for successful responses and the `error` property for error responses.
 
 This change only affects the return value of commands. Here is an example of how to use it:
 
@@ -32,4 +32,4 @@ console.log(data); // { request_id: '...', lease_id: '...', ... }
 
 This feature is called Atomic Responses, which means there are only two responses: `success` and `error`.
 
-Your editor/IDE might not detect any errors, so please make sure to update and verify correctness every usage.
+Your editor/IDE might not detect any errors, so please make sure to update and verify correctness with every usage.
