@@ -49,7 +49,7 @@ export function launchVault(): void {
 }
 
 export function destroyInstance(): void {
-  execSync('docker compose -f ${dcp} down', {
+  execSync(`docker compose -f ${dcp} down`, {
     stdio: 'ignore'
   });
 }

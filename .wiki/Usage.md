@@ -1,4 +1,4 @@
-## Custom Command Implementation
+## Custom Command
 
 At times, you may need to use a command or endpoint that is not available in the library, or you may want to use it in a
 different way. Here is an example of how to do that:
@@ -71,4 +71,24 @@ const vc = new Client({
 
 // Each individual command accepts the a second parameter to modify the request
 const status = vc.sealStatus(undefined, { dispatcher: agent });
+```
+
+## Custom Fetcher
+
+By default, the client will use the `fetch` function from `undici`. If you want to use a custom fetcher, you can do so by passing `fetcher` to the client.
+
+```typescript
+async function fetcher(url: URL, init: RequestInit) {
+  console.log(`fetching ${url.toString()}`);
+  return fetch(url, init);
+}
+
+const vc = new Client({
+  // ... other params
+  fetcher
+});
+
+// Or you already initialize the client and want to change it or remove it
+vc.fetcher = fetcher;
+delete vc.fetcher;
 ```

@@ -108,11 +108,13 @@ describe('node-vault', () => {
   });
 
   it('should implement a custom fetcher', async () => {
+    let used = false;
     const fancyFetcher = async (url: URL, init: RequestInit) => {
       expect(init).to.have.property('headers').to.have.property('X-Vault-Token').to.be.a('string');
       expect(init).to.have.property('method').to.be.equal('POST');
       expect(url).to.be.instanceof(URL);
       expect(url.toString()).to.equal('http://127.0.0.1:8200/v1/secret-path/test');
+      used = true;
       return fetch(url, init);
     };
 
@@ -128,6 +130,7 @@ describe('node-vault', () => {
     });
 
     expect(write).to.true;
+    expect(used).to.be.true;
 
     delete vc.fetcher;
 
