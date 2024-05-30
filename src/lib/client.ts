@@ -1,3 +1,6 @@
+import type { RequestInit } from 'undici';
+import { z } from 'zod';
+
 import { Aws } from '@/engine/aws';
 import { Kubernetes } from '@/engine/kubernetes';
 import { Kv } from '@/engine/kv';
@@ -9,9 +12,7 @@ import {
   ZodAnyRecord
 } from '@/schema';
 import { ClientOptions, Fetcher } from '@/typings';
-import { generateCommand } from '@litehex/node-vault';
-import type { RequestInit } from 'undici';
-import { z } from 'zod';
+import { generateCommand } from '@/utils/generate-command';
 
 class Client {
   endpoint: string;

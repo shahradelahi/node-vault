@@ -1,8 +1,9 @@
-import { Client } from '@litehex/node-vault';
-import { expect } from 'chai';
 import { execSync } from 'node:child_process';
 import { accessSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { expect } from 'chai';
+
+import { Client } from '@/index';
 
 const dcp = resolve('./tests/fixtures/docker-compose.yml');
 

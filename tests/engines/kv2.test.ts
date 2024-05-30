@@ -1,7 +1,8 @@
-import { Client } from '@litehex/node-vault';
-import { createInstance, destroyInstance, sleep } from '@tests/utils';
 import { expect } from 'chai';
 import { expectType } from 'tsd';
+
+import { Client } from '@/index';
+import { createInstance, destroyInstance, sleep } from '@tests/utils';
 
 describe('Key/Value Secrets Engine - Version 2', () => {
   const vc = new Client();

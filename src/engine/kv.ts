@@ -1,7 +1,8 @@
+import { z } from 'zod';
+
 import { ApiSector } from '@/lib/sector';
 import { SuccessResponseSchema, ZodAnyRecord } from '@/schema';
-import { generateCommand } from '@litehex/node-vault';
-import { z } from 'zod';
+import { generateCommand } from '@/utils/generate-command';
 
 /**
  * KV secrets engine - version 1

@@ -1,7 +1,8 @@
+import { z } from 'zod';
+
 import { ApiSector } from '@/lib/sector';
 import { ZodAnyRecord } from '@/schema';
-import { generateCommand } from '@litehex/node-vault';
-import { z } from 'zod';
+import { generateCommand } from '@/utils/generate-command';
 
 /**
  * Kubernetes secrets engine (API)

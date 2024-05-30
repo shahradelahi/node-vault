@@ -1,7 +1,8 @@
+import { z } from 'zod';
+
 import { generateCommand } from '@/index';
 import { ApiSector } from '@/lib/sector';
 import { SuccessResponseSchema, ZodAnyRecord } from '@/schema';
-import { z } from 'zod';
 
 export class Kv2 extends ApiSector {
   /**

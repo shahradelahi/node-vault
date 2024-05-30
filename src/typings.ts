@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
-import { VaultError } from '@/errors';
-import { ClientOptionsSchema } from '@/schema';
 import { SafeReturn } from 'p-safe';
 import { RequestInit, Response } from 'undici';
 import type { z } from 'zod';
 import type { RequestSchema as ZodRequestSchema } from 'zod-request';
+
+import { VaultError } from '@/errors';
+import { ClientOptionsSchema } from '@/schema';
 
 export type ClientOptions = z.infer<typeof ClientOptionsSchema> & {
   request?: Partial<RequestInit>;
