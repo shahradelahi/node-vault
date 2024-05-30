@@ -11,7 +11,7 @@
 </h1>
 
 _node-vault_ is a Javascript HTTP client for [HashiCorp's Vault](https://developer.hashicorp.com/vault/api-docs) API
-that allows you tyo have typesafe access to the API using [TypeScript](https://www.typescriptlang.org/)
+that allows you to have typesafe access to the API using [TypeScript](https://www.typescriptlang.org/)
 and [Zod](https://github.com/colinhacks/zod).
 
 ---
