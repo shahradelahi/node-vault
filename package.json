@@ -31,12 +31,12 @@
     "ci:publish": "changeset publish",
     "prepublishOnly": "pnpm test && pnpm lint && pnpm format:check && pnpm build"
   },
-  "packageManager": "pnpm@8.15.0",
+  "packageManager": "pnpm@8.15.7",
   "dependencies": {
     "lodash.omit": "^4.5.0",
     "lodash.pick": "^4.4.0",
     "p-safe": "^1.0.0",
-    "undici": "^6.18.2",
+    "undici": "^6.19.2",
     "zod": "^3.23.8",
     "zod-request": "^0.2.2"
   },
@@ -46,18 +46,18 @@
     "@types/chai": "^4.3.16",
     "@types/lodash.omit": "^4.5.9",
     "@types/lodash.pick": "^4.4.9",
-    "@types/mocha": "^10.0.6",
-    "@types/node": "^20.12.13",
-    "@typescript-eslint/eslint-plugin": "^7.11.0",
+    "@types/mocha": "^10.0.7",
+    "@types/node": "^20.14.8",
+    "@typescript-eslint/eslint-plugin": "^7.13.1",
     "chai": "^5.1.1",
     "dotenv": "^16.4.5",
     "eslint": "^8.57.0",
     "mocha": "^10.4.0",
-    "prettier": "^3.2.5",
-    "tsd": "^0.31.0",
-    "tsup": "^8.0.2",
-    "tsx": "^4.11.0",
-    "typescript": "^5.4.5"
+    "prettier": "^3.3.2",
+    "tsd": "^0.31.1",
+    "tsup": "^8.1.0",
+    "tsx": "^4.15.7",
+    "typescript": "^5.5.2"
   },
   "type": "module",
   "engines": {
