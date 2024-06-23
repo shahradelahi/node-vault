@@ -16,7 +16,7 @@ and [Zod](https://github.com/colinhacks/zod).
 
 ---
 
-- [Features](#features)
+- [Features](#-features)
 - [Installation](#-installation)
 - [Usage](#-usage)
   - [Init and unseal vault](#init-and-unseal-vault)
@@ -26,9 +26,10 @@ and [Zod](https://github.com/colinhacks/zod).
 - [Contributing](#-contributing)
 - [License](#license)
 
-## Features
+## 👀 Features
 
-- Typesafe and Validated API
+- Simple API
+- Typesafe and Validated Requests from Zod
 - Extendable using Custom Commands
 
 ## 📦 Installation
@@ -50,7 +51,7 @@ const vc = new Client({
   endpoint: 'http://127.0.0.1:8200', // default
   token: 'hv.xxxxxxxxxxxxxxxxxxxxx' // Optional in case you want to initialize the vault
 });
-// { data: xxx }
+
 // Init vault
 const init = await vc.init({ secret_shares: 1, secret_threshold: 1 });
 console.log(init); // { data: { keys: [ ... ], keys_base64: [ ... ], ... } }
@@ -72,7 +73,7 @@ const mounted = await vc.mount({
   type: 'kv-v2'
 });
 
-console.log(mounted); // true
+console.log(mounted); // { data: true }
 
 const info = await vc.engineInfo({ mountPath: 'my-secret' });
 
