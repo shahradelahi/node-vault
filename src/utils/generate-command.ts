@@ -1,5 +1,5 @@
-import omit from 'lodash.omit';
-import pick from 'lodash.pick';
+import omit from 'lodash/omit';
+import pick from 'lodash/pick';
 import { SafeReturn, trySafe } from 'p-safe';
 import { fetch, type RequestInit } from 'undici';
 import { z } from 'zod';
