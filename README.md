@@ -7,7 +7,7 @@
 <a href="https://github.com/shahradelahi/node-vault/actions/workflows/ci.yml" title="Build status"><img src="https://github.com/shahradelahi/node-vault/actions/workflows/ci.yml/badge.svg" alt="Build status"></a>
 <a href="https://www.npmjs.com/package/@litehex/node-vault" title="NPM Version"><img src="https://img.shields.io/npm/v/@litehex/node-vault" alt="npm"></a>
 <a href="https://www.npmjs.com/package/@litehex/node-vault" title="Downloads"><img alt="NPM Downloads" src="https://img.shields.io/npm/dm/@litehex%2Fnode-vault.svg"></a>
-<a href="https://opensource.org/licenses/GPL-3.0" title="License"><img src="https://img.shields.io/badge/License-GPL3.0-blue.svg?style=flat" alt="GPL-3.0 Licensed"></a>
+<a href="https://opensource.org/licenses/MIT" title="License"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat" alt="MIT Licensed"></a>
 </h1>
 
 _node-vault_ is a Javascript HTTP client for [HashiCorp's Vault](https://developer.hashicorp.com/vault/api-docs) API
