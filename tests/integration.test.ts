@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { expectType } from 'tsd';
-import { ProxyAgent } from 'undici';
+import { fetch, ProxyAgent } from 'undici';
 import { z } from 'zod';
 
 import { Client, generateCommand, VaultError } from '@/index';
@@ -129,6 +129,7 @@ describe('node-vault', () => {
       expect(url).to.be.instanceof(URL);
       expect(url.toString()).to.equal('http://127.0.0.1:8200/v1/secret-path/test');
       used = true;
+      // @ts-expect-error Init type has some missing properties
       return fetch(url, init);
     };
 
@@ -181,6 +182,7 @@ describe('node-vault', () => {
     }
 
     const agent = new ProxyAgent(HTTP_PROXY);
+    vc.fetcher = fetch;
 
     const status = await vc.sealStatus(undefined, { dispatcher: agent });
 

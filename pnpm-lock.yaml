@@ -8,9 +8,6 @@ dependencies:
   p-safe:
     specifier: ^1.0.0
     version: 1.0.0
-  undici:
-    specifier: ^6.19.2
-    version: 6.19.2
   zod:
     specifier: ^3.23.8
     version: 3.23.8
@@ -73,6 +70,9 @@ devDependencies:
   typescript:
     specifier: ^5.5.2
     version: 5.5.2
+  undici:
+    specifier: ^6.19.8
+    version: 6.19.8
 
 packages:
 
@@ -3988,10 +3988,10 @@ packages:
     resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
     dev: true
 
-  /undici@6.19.2:
-    resolution: {integrity: sha512-JfjKqIauur3Q6biAtHJ564e3bWa8VvT+7cSiOJHFbX4Erv6CLGDpg8z+Fmg/1OI/47RA+GI2QZaF48SSaLvyBA==}
+  /undici@6.19.8:
+    resolution: {integrity: sha512-U8uCCl2x9TK3WANvmBavymRzxbfFYG+tAu+fgx3zxQy3qdagQqBLwJVrdyO1TBfUXvfKveMKJZhpvUYoOjM+4g==}
     engines: {node: '>=18.17'}
-    dev: false
+    dev: true
 
   /universalify@0.1.2:
     resolution: {integrity: sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==}

@@ -1,4 +1,3 @@
-import type { RequestInit } from 'undici';
 import { z } from 'zod';
 
 import { Aws } from '@/engine/aws';

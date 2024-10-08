@@ -1,7 +1,6 @@
 import { execSync } from 'node:child_process';
 import { accessSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { expect } from 'chai';
 
 import { Client } from '@/index';
 
@@ -25,7 +24,7 @@ export async function createInstance(unsealed: boolean = true): Promise<{
     secret_shares: 1,
     secret_threshold: 1
   });
-  expect(error, error?.message).be.be.undefined;
+  if (error) throw error;
 
   const { keys, root_token } = data!;
 
