@@ -2,34 +2,12 @@
 "@litehex/node-vault": major
 ---
 
-BREAKING: The responses are wrapped in a record of type `SafeReturn<T, VaultError>`. This record contains the `data` property for successful responses and the `error` property for error responses.
+BREAKING: The responses of commands are wrapped in a record with type of `SafeReturn<T, VaultError>`. 
 
-This change only affects the return value of commands. Here is an example of how to use it:
+This record contains two properties:
 
-```typescript
-import { VaultError, Client } from '@litehex/node-vault';
+- `data`: The `data` property for successful responses. The value depends on the command.
+- `error`: The `error` property for error responses. The type is `VaultError`, which is a subclass of `Error`.
 
-const { data, error } = await vc.write({
-  path: 'secret/test',
-  data: {
-    foo: 'bar'
-  }
-});
+Read [Migration guide](https://github.com/shahradelahi/node-vault/wiki/Migration) for more details on how to use it.
 
-
-if (error) {
-  if (error instanceof VaultError) {
-    return console.log(`Panic Mode: ${error.message}`);
-  }
-  return console.log(error); // Probably fetch failed. Should we retry?
-}
-
-// The error is checked by the last statement above and the only possibility is the success response with the `data` property
-
-console.log(error); // undefined
-console.log(data); // { request_id: '...', lease_id: '...', ... }
-```
-
-This feature is called Atomic Responses, which means there are only two responses: `success` and `error`.
-
-Your editor/IDE might not detect any errors, so please make sure to update and verify correctness with every usage.
