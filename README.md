@@ -119,4 +119,4 @@ suggestions.
 
 ### License
 
-[GPL-3.0](LICENSE) © [Shahrad Elahi](https://github.com/shahradelahi)
+[MIT](LICENSE) © [Shahrad Elahi](https://github.com/shahradelahi)
