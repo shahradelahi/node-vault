@@ -8,7 +8,7 @@ import { VaultError } from '@/errors';
 import { ClientOptionsSchema } from '@/schema';
 
 export type ClientOptions = z.infer<typeof ClientOptionsSchema> & {
-  request?: Partial<RequestInit>;
+  request?: Partial<RequestInit & Record<string, unknown>>;
   fetcher?: Fetcher;
 };
 
@@ -19,7 +19,7 @@ export type RequestSchema = Omit<ZodRequestSchema, 'path' | 'body'> & {
 
 export type Fetcher = (input: any, init: any) => Promise<any>;
 
-export interface ExtendedRequestInit extends RequestInit {
+export interface ExtendedRequestInit extends RequestInit, Record<string, unknown> {
   strictSchema?: boolean;
 }
 

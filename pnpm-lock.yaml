@@ -70,6 +70,9 @@ devDependencies:
   typescript:
     specifier: ^5.5.2
     version: 5.5.2
+  undici:
+    specifier: ^6.19.8
+    version: 6.19.8
 
 packages:
 
@@ -3983,6 +3986,11 @@ packages:
 
   /undici-types@5.26.5:
     resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
+    dev: true
+
+  /undici@6.19.8:
+    resolution: {integrity: sha512-U8uCCl2x9TK3WANvmBavymRzxbfFYG+tAu+fgx3zxQy3qdagQqBLwJVrdyO1TBfUXvfKveMKJZhpvUYoOjM+4g==}
+    engines: {node: '>=18.17'}
     dev: true
 
   /universalify@0.1.2:
