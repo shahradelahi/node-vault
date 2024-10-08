@@ -104,7 +104,7 @@ console.log(deleted); // { data: true }
 
 For complete usages, please dive into the [Wiki](https://github.com/shahradelahi/node-vault/wiki).
 
-For all configuration options, please see [the API docs](https://paka.dev/npm/@litehex/node-vault).
+For all configuration options, please see [the API docs](https://www.jsdocs.io/package/@litehex/node-vault).
 
 ### 🤝 Contributing
 
