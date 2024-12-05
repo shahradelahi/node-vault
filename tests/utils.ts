@@ -16,7 +16,7 @@ export async function createInstance(unsealed: boolean = true): Promise<{
   root_token: string;
 }> {
   launchVault();
-  await sleep(3000);
+  await sleep(5000);
 
   const vc = new Client();
 
@@ -26,9 +26,9 @@ export async function createInstance(unsealed: boolean = true): Promise<{
   });
   if (error) throw error;
 
-  const { keys, root_token } = data!;
+  const { keys, root_token } = data;
 
-  await sleep(2000);
+  await sleep(1000);
 
   if (unsealed) {
     await vc.unseal({

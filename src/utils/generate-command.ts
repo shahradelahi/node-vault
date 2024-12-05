@@ -1,11 +1,16 @@
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
-import { SafeReturn, trySafe } from 'p-safe';
+import { trySafe, type SafeReturn } from 'p-safe';
 import { z } from 'zod';
-import { generateRequest, ZodRequestInit, ZodResponse } from 'zod-request';
+import {
+  generateRequest,
+  ZodResponse,
+  type ZodRequestInit,
+  type ZodValidationError
+} from 'zod-request';
 
 import { VaultError } from '@/errors';
-import { CommandFn, CommandInit, RequestSchema } from '@/typings';
+import type { CommandFn, CommandInit, RequestSchema } from '@/typings';
 
 import { isJson } from './json';
 import { removeUndefined } from './object';
@@ -16,45 +21,54 @@ export function generateCommand<Schema extends RequestSchema, RawResponse extend
   raw: RawResponse = false
 ): CommandFn<Schema, RawResponse> {
   return async (args, options = {}) => {
+    const { method = 'GET', path, client, schema } = init;
+    const { strictSchema = true, ...opts } = options;
+
+    const requestInit = {
+      method,
+      ...opts,
+      path: !schema?.path ? undefined : pick(args || {}, Object.keys(schema.path.shape)),
+      params: !schema?.searchParams
+        ? undefined
+        : pick(args || {}, Object.keys(schema.searchParams.shape)),
+      body: !schema?.body
+        ? undefined
+        : schema.body instanceof z.ZodObject
+          ? pick(args || {}, Object.keys(schema.body.shape))
+          : (removeUndefined(
+              omit(
+                args,
+                // Potential Body Keys
+                Object.keys(schema.searchParams?.shape || {})
+                  .concat(Object.keys(schema.path?.shape || {}))
+                  .concat(Object.keys(schema.headers?.shape || {}))
+              )
+            ) as any),
+      headers: removeUndefined(
+        Object.assign(
+          {
+            'X-Vault-Token': client.token,
+            'X-Vault-Namespace': client.namespace
+          },
+          opts.headers || {}
+        )
+      ),
+      schema: Object.assign(schema, {
+        response: z.union([
+          schema.response ?? z.any(),
+          z.object({
+            errors: z.array(z.string())
+          })
+        ])
+      })
+    } as ZodRequestInit<any, any>;
+
+    const { url: _url, input } = generateRequest(
+      `${client.endpoint}/${client.apiVersion}${client.pathPrefix}${path}`,
+      requestInit
+    );
+
     return trySafe(async () => {
-      const { method = 'GET', path, client, schema } = init;
-      const { strictSchema = true, ...opts } = options;
-
-      const { url: _url, input } = generateRequest(
-        `${client.endpoint}/${client.apiVersion}${client.pathPrefix}${path}`,
-        {
-          method,
-          ...opts,
-          path: !schema?.path ? undefined : pick(args || {}, Object.keys(schema.path.shape)),
-          params: !schema?.searchParams
-            ? undefined
-            : pick(args || {}, Object.keys(schema.searchParams.shape)),
-          body: !schema?.body
-            ? undefined
-            : schema.body instanceof z.ZodObject
-              ? pick(args || {}, Object.keys(schema.body.shape))
-              : (removeUndefined(
-                  omit(
-                    args,
-                    // Potential Body Keys
-                    Object.keys(schema.searchParams?.shape || {})
-                      .concat(Object.keys(schema.path?.shape || {}))
-                      .concat(Object.keys(schema.headers?.shape || {}))
-                  )
-                ) as any),
-          headers: removeUndefined(
-            Object.assign(
-              {
-                'X-Vault-Token': client.token,
-                'X-Vault-Namespace': client.namespace
-              },
-              opts.headers || {}
-            )
-          ),
-          schema
-        } as ZodRequestInit<any, any>
-      );
-
       const fetcher = init.fetcher || client.fetcher || fetch;
 
       const rawInit = Object.assign(input as RequestInit, {
@@ -90,30 +104,47 @@ export function generateCommand<Schema extends RequestSchema, RawResponse extend
 
       if (!strictSchema || !schema.response || schema.response instanceof z.ZodAny) {
         if (hasJsonContentType) {
-          return resolve(await response.json());
+          return resolve(response, await response.json());
         }
 
-        return resolve(parseText(await response.text()));
+        return resolve(response, parseText(await response.text()));
       }
 
-      const zr = new ZodResponse(response, schema.response);
+      // From here it might throw a schema validation error
+      try {
+        const zr = new ZodResponse(response, schema.response);
 
-      if (hasJsonContentType) {
-        return resolve(await zr.json());
+        if (hasJsonContentType) {
+          return resolve(response, await zr.json());
+        }
+
+        return resolve(response, parseText(await zr.text()));
+      } catch (e) {
+        if (e && e instanceof VaultError) return { error: e };
+
+        if (e && typeof e === 'object' && e.constructor.name === 'ZodValidationError') {
+          const error = new VaultError('Failed to validate response schema');
+          error.cause = (e as unknown as ZodValidationError).flatten();
+          return { error };
+        }
+
+        const error = new VaultError('Failed to parse response');
+        error.cause = e;
+        return { error };
       }
-
-      return resolve(parseText(await zr.text()));
     });
   };
 }
 
-function resolve<T>(response: any): SafeReturn<T, VaultError> {
+function resolve<T>(response: Response, data: any): SafeReturn<T, VaultError> {
   // It's a Json error response
-  if (typeof response === 'object' && 'errors' in response) {
-    return { error: new VaultError(response.errors) };
+  if (typeof data === 'object' && 'errors' in data) {
+    const error = new VaultError(data.errors);
+    error.cause = response;
+    return { error };
   }
 
-  return { data: response };
+  return { data: data };
 }
 
 function parseText(text: string): object | string {

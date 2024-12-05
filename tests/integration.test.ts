@@ -21,6 +21,18 @@ describe('node-vault', () => {
     await sleep(2e3);
   });
 
+  it('should handle errors', async () => {
+    const res = await vc.init({
+      secret_shares: 1,
+      secret_threshold: 1
+    });
+    expect(res)
+      .have.property('error')
+      .be.instanceof(VaultError)
+      .have.property('message')
+      .be.equal('Vault is already initialized');
+  });
+
   it('should get vault health', async () => {
     const { data, error } = await vc.health();
     expect(error).be.undefined;
