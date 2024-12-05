@@ -4,7 +4,7 @@ import { fetch, ProxyAgent } from 'undici';
 import { z } from 'zod';
 
 import { Client, generateCommand, VaultError } from '@/index';
-import { createInstance, destroyInstance, launchVault, sleep } from '@tests/utils';
+import { createInstance, destroyInstance, launchVault, sleep } from '@/tests/utils';
 
 describe('node-vault', () => {
   const vc = new Client();
