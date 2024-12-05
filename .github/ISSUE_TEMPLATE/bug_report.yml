@@ -1,0 +1,27 @@
+name: 🐞 Bug Report
+description: Something not working as expected
+labels: [bug]
+body:
+  - type: textarea
+    attributes:
+      label: Current behavior
+      description: Describe how the issue manifests and please include relevant error messages and steps to reproduce it.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Expected behavior
+      description: Describe what the desired behavior would be.
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Versions
+      description: What versions of the package are you using?
+      placeholder: |
+        node-vault@1.0.0
+        node@22.0.0
+    validations:
+      required: true
