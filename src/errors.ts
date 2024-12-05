@@ -3,6 +3,6 @@ export class VaultError extends Error {
     if (Array.isArray(error)) {
       error = error.join('\n');
     }
-    super(`VaultError: ${error && error !== '' ? error : 'Not Found'}`);
+    super(error && error !== '' ? error : 'Not Found');
   }
 }
