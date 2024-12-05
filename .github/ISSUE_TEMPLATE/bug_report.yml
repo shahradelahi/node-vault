@@ -21,7 +21,7 @@ body:
       label: Versions
       description: What versions of the package are you using?
       placeholder: |
-        node-vault@1.0.0
+        @litehex/node-vault@1.0.0
         node@22.0.0
     validations:
       required: true
