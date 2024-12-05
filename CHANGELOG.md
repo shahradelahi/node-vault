@@ -1,5 +1,11 @@
 # @litehex/node-vault
 
+## 1.0.1
+
+### Patch Changes
+
+- 907a84d: fix: improve error handling
+
 ## 1.0.0
 
 ### Major Changes
