@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
 import { Client } from '@/index';
-import { createInstance, destroyInstance, sleep } from '@tests/utils';
+import { createInstance, destroyInstance, sleep } from '@/tests/utils';
 
 describe('Key/Value Secrets Engine - Version 1', () => {
   const vc = new Client();
