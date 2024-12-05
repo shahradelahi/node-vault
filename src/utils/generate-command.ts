@@ -144,7 +144,7 @@ function resolve<T>(response: Response, data: any): SafeReturn<T, VaultError> {
     return { error };
   }
 
-  return { data: data };
+  return { data };
 }
 
 function parseText(text: string): object | string {
