@@ -1,7 +1,7 @@
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 import { trySafe, type SafeReturn } from 'p-safe';
-import { z } from 'zod';
+import * as z from 'zod';
 import {
   generateRequest,
   ZodResponse,

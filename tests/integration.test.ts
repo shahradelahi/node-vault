@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { expectType } from 'tsd';
 import { fetch, ProxyAgent } from 'undici';
-import { z } from 'zod';
+import * as z from 'zod';
 
 import { Client, generateCommand, VaultError } from '@/index';
 import { createInstance, destroyInstance, launchVault, sleep } from '@/tests/utils';
