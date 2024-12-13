@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 
 import { Aws } from '@/engine/aws';
 import { Kubernetes } from '@/engine/kubernetes';

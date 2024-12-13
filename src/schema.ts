@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 
 export const AuthSchema = z.object({
   client_token: z.string(),
