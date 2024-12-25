@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 
 import { Aws } from '@/engine/aws';
 import { Kubernetes } from '@/engine/kubernetes';
@@ -76,8 +76,7 @@ class Client {
       path: z.object({
         mountPath: z.string()
       }),
-      body: z.any(),
-      response: z.any()
+      response: ZodAnyRecord
     }
   });
 

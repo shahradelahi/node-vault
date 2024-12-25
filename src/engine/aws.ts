@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 
 import { ApiSector } from '@/lib/sector';
 import { generateCommand } from '@/utils/generate-command';
