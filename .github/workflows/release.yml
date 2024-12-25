@@ -21,9 +21,7 @@ jobs:
           fetch-depth: 0
 
       - name: Use PNPM v8
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
+        uses: pnpm/action-setup@v4
 
       - name: Use Node v18
         uses: actions/setup-node@v4
