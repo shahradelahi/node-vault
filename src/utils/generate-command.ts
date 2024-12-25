@@ -1,7 +1,7 @@
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 import { trySafe, type SafeReturn } from 'p-safe';
-import { z } from 'zod';
+import * as z from 'zod';
 import {
   generateRequest,
   ZodResponse,
@@ -10,27 +10,40 @@ import {
 } from 'zod-request';
 
 import { VaultError } from '@/errors';
-import type { CommandFn, CommandInit, RequestSchema } from '@/typings';
+import type { CommandInit, CommandOptions, Infer, RequestSchema } from '@/typings';
 
 import { isJson } from './json';
 import { removeUndefined } from './object';
 
 export function generateCommand<Schema extends RequestSchema, RawResponse extends boolean = false>(
-  init: CommandInit<Schema>,
-  // @ts-expect-error Type 'RawResponse' is not assignable to type 'boolean'
-  raw: RawResponse = false
-): CommandFn<Schema, RawResponse> {
-  return async (args, options = {}) => {
+  init: CommandInit<Schema, RawResponse>,
+  raw: boolean = false
+) {
+  return async (
+    args?: Infer<Schema['path']> &
+      Infer<Schema['searchParams']> &
+      Infer<Schema['headers']> &
+      Infer<Schema['body']> & { [key: string]: unknown },
+    options: CommandOptions = {}
+  ): Promise<
+    SafeReturn<RawResponse extends true ? Response : Infer<Schema['response']>, VaultError>
+  > => {
     const { method = 'GET', path, client, schema } = init;
     const { strictSchema = true, ...opts } = options;
 
     const requestInit = {
       method,
       ...opts,
-      path: !schema?.path ? undefined : pick(args || {}, Object.keys(schema.path.shape)),
-      params: !schema?.searchParams
-        ? undefined
-        : pick(args || {}, Object.keys(schema.searchParams.shape)),
+      path:
+        schema?.path && typeof schema?.path === 'object'
+          ? pick(args || {}, Object.keys(schema.path.shape))
+          : undefined,
+
+      params:
+        schema?.searchParams && typeof schema?.searchParams === 'object'
+          ? pick(args || {}, Object.keys(schema.searchParams.shape))
+          : undefined,
+
       body: !schema?.body
         ? undefined
         : schema.body instanceof z.ZodObject
@@ -44,6 +57,7 @@ export function generateCommand<Schema extends RequestSchema, RawResponse extend
                   .concat(Object.keys(schema.headers?.shape || {}))
               )
             ) as any),
+
       headers: removeUndefined(
         Object.assign(
           {
@@ -53,6 +67,7 @@ export function generateCommand<Schema extends RequestSchema, RawResponse extend
           opts.headers || {}
         )
       ),
+
       schema: Object.assign(schema, {
         response: z.union([
           schema.response ?? z.any(),
@@ -88,7 +103,7 @@ export function generateCommand<Schema extends RequestSchema, RawResponse extend
       }
 
       const response = await fetcher(url, refinedInput);
-      if (raw !== false) {
+      if (raw) {
         return { data: response };
       }
 

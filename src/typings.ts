@@ -1,67 +1,45 @@
-/* eslint-disable @typescript-eslint/ban-types */
+import type * as z from 'zod';
 
-import { SafeReturn } from 'p-safe';
-import type { z } from 'zod';
-import type { RequestSchema as ZodRequestSchema } from 'zod-request';
+import type { ClientOptionsSchema } from '@/schema';
 
-import { VaultError } from '@/errors';
-import { ClientOptionsSchema } from '@/schema';
-
-export type ClientOptions = z.infer<typeof ClientOptionsSchema> & {
+export interface ClientOptions extends Infer<typeof ClientOptionsSchema> {
   request?: Partial<RequestInit & Record<string, unknown>>;
   fetcher?: Fetcher;
-};
+}
 
-export type RequestSchema = Omit<ZodRequestSchema, 'path' | 'body'> & {
+export interface RequestSchema {
   path?: z.ZodObject<any>;
-  body?: z.ZodObject<any> | z.ZodAny;
-};
+  body?: z.ZodObject<any> | z.ZodRecord<any>;
+  searchParams?: z.ZodObject<any>;
+  headers?: z.ZodObject<any>;
+  response?: z.ZodType<unknown>;
+}
 
-export type Fetcher = (input: any, init: any) => Promise<any>;
+export interface Fetcher {
+  (input: any, init: any): Promise<any>;
+}
 
-export interface ExtendedRequestInit extends RequestInit, Record<string, unknown> {
+export interface CommandOptions extends Omit<RequestInit, 'url'>, Record<string, unknown> {
   strictSchema?: boolean;
 }
 
-type RequestInitWithURL = RequestInit & {
+interface RequestInitWithURL extends RequestInit {
   url: URL;
-};
+}
 
-export type CommandInit<Schema extends RequestSchema> = {
+export interface CommandInit<Schema extends RequestSchema, RawResponse extends boolean = false> {
   method: RequestInit['method'];
   path: string;
   schema: Schema;
   client: ClientOptions;
+  raw?: RawResponse;
   refine?: (init: RequestInitWithURL, args: CommandArgs<Schema>) => RequestInitWithURL;
   fetcher?: Fetcher;
-};
+}
 
-export type CommandArgs<Schema extends RequestSchema> =
-  // Path Schema
-  (Schema['path'] extends z.ZodObject<any> ? z.infer<Schema['path']> : {}) &
-    // SearchParams Schema
-    (Schema['searchParams'] extends z.ZodObject<any> ? z.infer<Schema['searchParams']> : {}) &
-    // Headers Schema
-    (Schema['headers'] extends z.ZodObject<any> ? z.infer<Schema['headers']> : {}) &
-    // Body Schema
-    (Schema['body'] extends z.ZodDiscriminatedUnion<any, any>
-      ? z.infer<Schema['body']>
-      : Schema['body'] extends z.ZodAny
-        ? {}
-        : Schema['body'] extends z.ZodObject<any>
-          ? z.infer<Schema['body']>
-          : {});
+export type CommandArgs<Schema extends RequestSchema> = Infer<Schema['path']> &
+  Infer<Schema['searchParams']> &
+  Infer<Schema['headers']> &
+  Infer<Schema['body']> & { [key: string]: unknown };
 
-export type CommandFn<Schema extends RequestSchema, RawResponse extends boolean = false> = (
-  args?: CommandArgs<Schema>,
-  options?: Omit<ExtendedRequestInit, 'url'>
-) => Promise<
-  SafeReturn<
-    RawResponse extends true
-      ? Response
-      : Schema['response'] extends z.ZodType
-        ? z.infer<Schema['response']>
-        : unknown,
-    VaultError
-  >
->;
+export type Infer<T> = T extends z.ZodSchema ? z.infer<T> : T;
