@@ -10,7 +10,6 @@ export default defineConfig({
       comments: false
     }
   },
-  noExternal: ['lodash'],
   entry: ['src/index.ts'],
   format: ['cjs', 'esm'],
   target: 'esnext',
