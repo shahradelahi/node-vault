@@ -1,5 +1,11 @@
 # @litehex/node-vault
 
+## 1.0.2
+
+### Patch Changes
+
+- 8c9d184: fix: optimize types that significantly reduce bundle size (around 54%).
+
 ## 1.0.1
 
 ### Patch Changes
