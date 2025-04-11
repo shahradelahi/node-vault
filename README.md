@@ -119,4 +119,4 @@ suggestions.
 
 ### License
 
-[MIT](LICENSE) © [Shahrad Elahi](https://github.com/shahradelahi)
+[MIT](/LICENSE) © [Shahrad Elahi](https://github.com/shahradelahi) and [contributors](https://github.com/shahradelahi/node-vault/graphs/contributors).
