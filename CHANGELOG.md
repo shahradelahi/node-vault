@@ -1,5 +1,11 @@
 # @litehex/node-vault
 
+## 1.0.3
+
+### Patch Changes
+
+- ad48a22: Replaced lodash-es and its type definitions to resolve missing module imports and reduce bundle size.
+
 ## 1.0.2
 
 ### Patch Changes
