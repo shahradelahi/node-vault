@@ -120,45 +120,47 @@ export class Kv extends ApiSector {
         path: z.object({
           mountPath: z.string()
         }),
-        response: SuccessResponseSchema.extend({
-          deprecation_status: z.string(),
-          type: z.string(),
-          description: z.string(),
-          seal_wrap: z.boolean(),
-          options: ZodAnyRecord,
-          running_plugin_version: z.string(),
-          running_sha256: z.string(),
-          config: z.object({
-            default_lease_ttl: z.number(),
-            force_no_cache: z.boolean(),
-            max_lease_ttl: z.number()
-          }),
-          accessor: z.string(),
-          local: z.boolean(),
-          external_entropy_access: z.boolean(),
-          uuid: z.string(),
-          plugin_version: z.string(),
-          data: z.object({
-            accessor: z.string(),
-            config: z.object({
-              default_lease_ttl: z.number(),
-              force_no_cache: z.boolean(),
-              max_lease_ttl: z.number()
-            }),
-            deprecation_status: z.string(),
-            description: z.string(),
-            external_entropy_access: z.boolean(),
-            local: z.boolean(),
-            options: ZodAnyRecord,
-            plugin_version: z.string(),
-            running_plugin_version: z.string(),
-            running_sha256: z.string(),
-            seal_wrap: z.boolean(),
-            type: z.string(),
-            uuid: z.string()
-          })
-        })
+        response: EngineInfoSchema
       }
     });
   }
 }
+
+export const EngineInfoSchema = SuccessResponseSchema.extend({
+  deprecation_status: z.string(),
+  type: z.string(),
+  description: z.string(),
+  seal_wrap: z.boolean(),
+  options: ZodAnyRecord,
+  running_plugin_version: z.string(),
+  running_sha256: z.string(),
+  config: z.object({
+    default_lease_ttl: z.number(),
+    force_no_cache: z.boolean(),
+    max_lease_ttl: z.number()
+  }),
+  accessor: z.string(),
+  local: z.boolean(),
+  external_entropy_access: z.boolean(),
+  uuid: z.string(),
+  plugin_version: z.string(),
+  data: z.object({
+    accessor: z.string(),
+    config: z.object({
+      default_lease_ttl: z.number(),
+      force_no_cache: z.boolean(),
+      max_lease_ttl: z.number()
+    }),
+    deprecation_status: z.string(),
+    description: z.string(),
+    external_entropy_access: z.boolean(),
+    local: z.boolean(),
+    options: ZodAnyRecord,
+    plugin_version: z.string(),
+    running_plugin_version: z.string(),
+    running_sha256: z.string(),
+    seal_wrap: z.boolean(),
+    type: z.string(),
+    uuid: z.string()
+  })
+});
