@@ -1,5 +1,11 @@
 # @litehex/node-vault
 
+## 1.0.4
+
+### Patch Changes
+
+- ef1b231: fix: update kv engine schemas with `v1.19.x` api spec
+
 ## 1.0.3
 
 ### Patch Changes
