@@ -1,8 +1,9 @@
 import * as z from 'zod';
 
+import { EngineInfoSchema } from '@/engine/kv';
 import { generateCommand } from '@/index';
 import { ApiSector } from '@/lib/sector';
-import { SuccessResponseSchema, ZodAnyRecord } from '@/schema';
+import { SuccessResponseSchema } from '@/schema';
 
 export class Kv2 extends ApiSector {
   /**
@@ -21,7 +22,7 @@ export class Kv2 extends ApiSector {
         }),
         body: z.object({
           max_versions: z.number().optional(),
-          cas_required: z.boolean().optional(),
+          cas_required: z.boolean().default(false).optional(),
           delete_version_after: z.string().optional()
         }),
         response: z.boolean()
@@ -70,7 +71,7 @@ export class Kv2 extends ApiSector {
           path: z.string()
         }),
         searchParams: z.object({
-          version: z.number().default(0).optional()
+          version: z.number().optional()
         }),
         response: SuccessResponseSchema.extend({
           data: z.object({
@@ -98,8 +99,8 @@ export class Kv2 extends ApiSector {
           path: z.string()
         }),
         body: z.object({
-          data: z.record(z.any()).default({}),
-          options: PostOptionsSchema.default({}).optional()
+          data: z.record(z.any()),
+          options: PostOptionsSchema.optional()
         }),
         response: SuccessResponseSchema.extend({
           data: MetadataSchema
@@ -130,8 +131,8 @@ export class Kv2 extends ApiSector {
           path: z.string()
         }),
         body: z.object({
-          data: z.any(),
-          options: PostOptionsSchema
+          data: z.record(z.any()),
+          options: PostOptionsSchema.optional()
         }),
         response: z.object({
           data: MetadataSchema
@@ -400,44 +401,7 @@ export class Kv2 extends ApiSector {
         path: z.object({
           mountPath: z.string()
         }),
-        response: SuccessResponseSchema.extend({
-          local: z.boolean(),
-          seal_wrap: z.boolean(),
-          external_entropy_access: z.boolean(),
-          options: ZodAnyRecord,
-          running_sha256: z.string(),
-          deprecation_status: z.string(),
-          config: z.object({
-            default_lease_ttl: z.number(),
-            force_no_cache: z.boolean(),
-            max_lease_ttl: z.number()
-          }),
-          type: z.string(),
-          description: z.string(),
-          accessor: z.string(),
-          uuid: z.string(),
-          plugin_version: z.string(),
-          running_plugin_version: z.string(),
-          data: z.object({
-            accessor: z.string(),
-            config: z.object({
-              default_lease_ttl: z.number(),
-              force_no_cache: z.boolean(),
-              max_lease_ttl: z.number()
-            }),
-            deprecation_status: z.string(),
-            description: z.string(),
-            external_entropy_access: z.boolean(),
-            local: z.boolean(),
-            options: ZodAnyRecord,
-            plugin_version: z.string(),
-            running_plugin_version: z.string(),
-            running_sha256: z.string(),
-            seal_wrap: z.boolean(),
-            type: z.string(),
-            uuid: z.string()
-          })
-        })
+        response: EngineInfoSchema
       }
     });
   }
@@ -459,7 +423,7 @@ const MetadataRequestBodySchema = z.object({
 });
 
 const PostOptionsSchema = z.object({
-  cas: z.number().default(0),
+  cas: z.number().optional(),
   check_and_set: z.string().optional(),
   max_versions: z.number().optional(),
   prelease: z.number().optional(),
