@@ -100,9 +100,7 @@ describe('node-vault', () => {
     // Wait  seconds to ensure vault is sealed
     await sleep(2e3);
 
-    const unseal = await vc.unseal({
-      key: keys[0]
-    });
+    const unseal = await vc.unseal({ key: keys[0]! });
     expect(unseal).have.property('data').have.property('sealed', false);
   });
 

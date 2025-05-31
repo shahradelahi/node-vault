@@ -26,11 +26,11 @@ class Client {
     const { request, fetcher, ...restOpts } = opts;
     const options = ClientOptionsSchema.parse(restOpts);
 
-    this.endpoint = options.endpoint || process.env.VAULT_ADDR || 'http://127.0.0.1:8200';
+    this.endpoint = options.endpoint || process.env['VAULT_ADDR'] || 'http://127.0.0.1:8200';
     this.apiVersion = options.apiVersion || 'v1';
     this.pathPrefix = options.pathPrefix || '';
-    this.namespace = options.namespace || process.env.VAULT_NAMESPACE;
-    this.token = options.token || process.env.VAULT_TOKEN;
+    this.namespace = options.namespace || process.env['VAULT_NAMESPACE'];
+    this.token = options.token || process.env['VAULT_TOKEN'];
 
     this.fetcher = fetcher;
     this.request = request;
