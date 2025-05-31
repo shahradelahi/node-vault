@@ -1,4 +1,4 @@
-import { omit, pick } from 'lodash-es';
+import lodash from 'lodash';
 import { trySafe, type SafeReturn } from 'p-safe';
 import * as z from 'zod';
 import {
@@ -35,20 +35,20 @@ export function generateCommand<Schema extends RequestSchema, RawResponse extend
       ...opts,
       path:
         schema?.path && typeof schema?.path === 'object'
-          ? pick(args || {}, Object.keys(schema.path.shape))
+          ? lodash.pick(args || {}, Object.keys(schema.path.shape))
           : undefined,
 
       params:
         schema?.searchParams && typeof schema?.searchParams === 'object'
-          ? pick(args || {}, Object.keys(schema.searchParams.shape))
+          ? lodash.pick(args || {}, Object.keys(schema.searchParams.shape))
           : undefined,
 
       body: !schema?.body
         ? undefined
         : schema.body instanceof z.ZodObject
-          ? pick(args || {}, Object.keys(schema.body.shape))
+          ? lodash.pick(args || {}, Object.keys(schema.body.shape))
           : (removeUndefined(
-              omit(
+              lodash.omit(
                 args,
                 // Potential Body Keys
                 Object.keys(schema.searchParams?.shape || {})
