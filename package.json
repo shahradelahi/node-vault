@@ -43,7 +43,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "lodash-es": "^4.17.21",
+    "lodash": "^4.17.21",
     "p-safe": "^1.0.0",
     "zod": "^3.25.20",
     "zod-request": "^0.2.2"
@@ -53,7 +53,7 @@
     "@shahrad/prettier-config": "^1.2.2",
     "@shahrad/tsconfig": "^1.1.0",
     "@types/chai": "^5.2.2",
-    "@types/lodash-es": "^4.17.12",
+    "@types/lodash": "^4.17.12",
     "@types/mocha": "^10.0.10",
     "@types/node": "^20.17.50",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
