@@ -31,9 +31,7 @@ export async function createInstance(unsealed: boolean = true): Promise<{
   await sleep(1000);
 
   if (unsealed) {
-    await vc.unseal({
-      key: keys[0]
-    });
+    await vc.unseal({ key: keys[0]! });
     await sleep(2000);
   }
 
