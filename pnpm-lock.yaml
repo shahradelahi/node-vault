@@ -27,6 +27,9 @@ importers:
       '@shahrad/prettier-config':
         specifier: ^1.2.2
         version: 1.2.2(@ianvs/prettier-plugin-sort-imports@4.4.1(prettier@3.5.3))(prettier-plugin-packagejson@2.5.10(prettier@3.5.3))(prettier-plugin-sh@0.15.0(prettier@3.5.3))(prettier@3.5.3)
+      '@shahrad/tsconfig':
+        specifier: ^1.1.0
+        version: 1.1.0
       '@types/chai':
         specifier: ^5.2.2
         version: 5.2.2
@@ -516,6 +519,10 @@ packages:
       prettier: '>=3.0.0'
       prettier-plugin-packagejson: ^2.5
       prettier-plugin-sh: ^0.15
+
+  '@shahrad/tsconfig@1.1.0':
+    resolution: {integrity: sha512-WcziTJWK7DC49kbEKPwdZ/Mnhu3H6ZehpBg4UGbyDwU2Ze/QvSjZq1Nx6Vb2Pfgwjas1CHWkIA2d3GiW35fxsw==}
+    engines: {node: '>=18'}
 
   '@sinclair/typebox@0.27.8':
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
@@ -2368,6 +2375,8 @@ snapshots:
       prettier: 3.5.3
       prettier-plugin-packagejson: 2.5.10(prettier@3.5.3)
       prettier-plugin-sh: 0.15.0(prettier@3.5.3)
+
+  '@shahrad/tsconfig@1.1.0': {}
 
   '@sinclair/typebox@0.27.8': {}
 
