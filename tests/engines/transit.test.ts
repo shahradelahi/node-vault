@@ -498,7 +498,8 @@ describe('Transit Secrets Engine', () => {
     await vc.transit.updateKey({
       mountPath,
       name: 'test-key',
-      min_encryption_version: 1
+      min_encryption_version: 1,
+      min_decryption_version: 1
     });
 
     // Rotate key to create multiple versions
@@ -521,13 +522,19 @@ describe('Transit Secrets Engine', () => {
     const currentVersion = keyInfo?.data.latest_version || 1;
 
     // Trim to keep only the latest version
-    const trimmed = await vc.transit.trimKey({
+    const { data: trimmed, error: trimError } = await vc.transit.trimKey({
       mountPath,
       name: 'test-key',
       min_available_version: currentVersion
     });
 
-    expect(trimmed).have.property('data').be.true;
+    if (trimError) {
+      expectType<undefined>(trimmed);
+      return;
+    }
+
+    expectType<undefined>(trimError);
+    expect(trimmed).be.true;
   });
 
   it('should delete key', async () => {
@@ -545,17 +552,18 @@ describe('Transit Secrets Engine', () => {
       deletion_allowed: true
     });
 
-    const deleted = await vc.transit.deleteKey({
+    const { data: deleted, error: deleteError } = await vc.transit.deleteKey({
       mountPath,
       name: 'test-key'
     });
-    if (deleted.error) {
-      expectType<undefined>(deleted.data);
+
+    if (deleteError) {
+      expectType<undefined>(deleted);
       return;
     }
-    expectType<undefined>(deleted.error);
 
-    expect(deleted).have.property('data').be.true;
+    expectType<undefined>(deleteError);
+    expect(deleted).be.true;
 
     // Verify key is deleted
     const { error } = await vc.transit.readKey({

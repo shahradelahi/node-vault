@@ -1,7 +1,7 @@
 import * as z from 'zod';
 
 import { ApiSector } from '@/lib/sector';
-import { SuccessResponseSchema, ZodAnyRecord } from '@/schema';
+import { SuccessResponseSchema } from '@/schema';
 import { generateCommand } from '@/utils/generate-command';
 
 import { EngineInfoSchema } from './kv';
@@ -319,11 +319,11 @@ export class Transit extends ApiSector {
       schema: {
         path: z.object({
           mountPath: z.string(),
-          source: z.string().optional()
+          source: z.string()
         }),
         body: z.object({
-          bytes: z.number().optional(),
-          format: z.enum(['hex', 'base64']).optional()
+          bytes: z.number(),
+          format: z.enum(['hex', 'base64']).default('base64')
         }),
         response: GenerateRandomResponseSchema
       }
@@ -343,7 +343,16 @@ export class Transit extends ApiSector {
       schema: {
         path: z.object({
           mountPath: z.string(),
-          algorithm: z.string()
+          algorithm: z.enum([
+            'sha2-224',
+            'sha2-256',
+            'sha2-384',
+            'sha2-512',
+            'sha3-224',
+            'sha3-256',
+            'sha3-384',
+            'sha3-512'
+          ])
         }),
         body: z.object({
           input: z.string(),
@@ -451,8 +460,8 @@ export class Transit extends ApiSector {
           key_version: z.number().optional(),
           context: z.string().optional(),
           prehashed: z.boolean().optional(),
-          signature_algorithm: z.string().optional(),
-          marshaling_algorithm: z.string().optional(),
+          signature_algorithm: z.enum(['pss', 'pkcs1v15']).optional(),
+          marshaling_algorithm: z.enum(['asn1', 'jws']).optional(),
           salt_length: z.string().optional(),
           batch_input: z
             .array(

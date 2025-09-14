@@ -116,9 +116,9 @@ const keyCreated = await vc.transit.createKey({
   mountPath: 'transit',
   name: 'my-key',
   type: 'aes256-gcm96',
-  exportable: true
+  // Avoid exportable keys in production. Use true only if you must export material.
+  exportable: false
 });
-
 // Encrypt data
 const plaintext = Buffer.from('Hello, World!').toString('base64');
 const encrypted = await vc.transit.encrypt({
