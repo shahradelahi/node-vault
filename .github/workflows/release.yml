@@ -26,7 +26,7 @@ jobs:
       - name: Use Node v18
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: pnpm
 
       - name: Install dependencies
