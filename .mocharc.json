@@ -1,6 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/mocharc.json",
   "require": ["tsx", "dotenv/config", "chai/register-expect"],
+  "spec": ["**/*.test.ts"],
   "timeout": 20000,
   "parallel": false,
   "slow": 1000
