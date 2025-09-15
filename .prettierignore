@@ -1,5 +1,6 @@
 node_modules
 .changeset
+CHANGELOG.md
 dist
 
 .env
