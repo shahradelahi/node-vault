@@ -523,7 +523,8 @@ class Client {
         body: z.object({
           type: z.string(),
           description: z.string().optional(),
-          config: z.record(z.string()).optional()
+          config: z.record(z.any()).optional(),
+          options: z.record(z.any()).optional()
         })
       }
     });

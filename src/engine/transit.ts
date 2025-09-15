@@ -77,7 +77,7 @@ export class Transit extends ApiSector {
           allow_plaintext_backup: z.boolean().optional(),
           auto_rotate_period: z.string().optional()
         }),
-        response: z.boolean()
+        response: CreateKeyResponseSchema
       }
     });
   }
@@ -125,7 +125,7 @@ export class Transit extends ApiSector {
           allow_plaintext_backup: z.boolean().optional(),
           auto_rotate_period: z.string().optional()
         }),
-        response: z.boolean()
+        response: UpdateKeyResponseSchema
       }
     });
   }
@@ -542,7 +542,7 @@ export class Transit extends ApiSector {
           mountPath: z.string(),
           name: z.string()
         }),
-        response: z.boolean()
+        response: RotateKeyResponseSchema
       }
     });
   }
@@ -661,37 +661,51 @@ export class Transit extends ApiSector {
 }
 
 // Schema definitions
-const KeyMetadataSchema = z.object({
-  creation_time: z.string(),
+
+const TransitKey = z.object({
+  allow_plaintext_backup: z.boolean(),
+  auto_rotate_period: z.union([z.string(), z.number()]).optional(),
+  deletion_allowed: z.boolean(),
+  derived: z.boolean(),
+  exportable: z.boolean(),
+  imported_key: z.boolean().optional(),
+  keys: z.record(z.number()),
+  latest_version: z.number(),
+  min_available_version: z.number(),
+  min_decryption_version: z.number(),
+  min_encryption_version: z.number(),
   name: z.string(),
-  public_key: z.string().optional(),
-  hsm_handle: z.string().optional()
+  supports_decryption: z.boolean(),
+  supports_derivation: z.boolean(),
+  supports_encryption: z.boolean(),
+  supports_signing: z.boolean(),
+  type: z.string(),
+  supports_verification: z.boolean().optional(),
+  supports_export: z.boolean().optional(),
+  convergent_encryption: z.boolean().optional()
 });
 
-const ReadKeyResponseSchema = SuccessResponseSchema.extend({
-  data: z.object({
-    type: z.string(),
-    keys: z.record(KeyMetadataSchema),
-    latest_version: z.number(),
-    min_available_version: z.number(),
-    min_decryption_version: z.number(),
-    min_encryption_version: z.number(),
-    supports_encryption: z.boolean(),
-    supports_decryption: z.boolean(),
-    supports_derivation: z.boolean(),
-    supports_signing: z.boolean(),
-    supports_verification: z.boolean(),
-    supports_export: z.boolean(),
-    exportable: z.boolean(),
-    allow_plaintext_backup: z.boolean(),
-    convergent_encryption: z.boolean(),
-    derived: z.boolean(),
-    auto_rotate_period: z.string().optional(),
-    deletion_allowed: z.boolean()
-  })
+const TransitSuccessResponseSchema = SuccessResponseSchema.extend({
+  mount_type: z.literal('transit')
 });
 
-const EncryptResponseSchema = SuccessResponseSchema.extend({
+const CreateKeyResponseSchema = TransitSuccessResponseSchema.extend({
+  data: TransitKey
+});
+
+const ReadKeyResponseSchema = TransitSuccessResponseSchema.extend({
+  data: TransitKey
+});
+
+const UpdateKeyResponseSchema = TransitSuccessResponseSchema.extend({
+  data: TransitKey
+});
+
+const RotateKeyResponseSchema = TransitSuccessResponseSchema.extend({
+  data: TransitKey
+});
+
+const EncryptResponseSchema = TransitSuccessResponseSchema.extend({
   data: z.object({
     ciphertext: z.string().optional(),
     key_version: z.number().optional(),
@@ -706,7 +720,7 @@ const EncryptResponseSchema = SuccessResponseSchema.extend({
   })
 });
 
-const DecryptResponseSchema = SuccessResponseSchema.extend({
+const DecryptResponseSchema = TransitSuccessResponseSchema.extend({
   data: z.object({
     plaintext: z.string().optional(),
     batch_results: z
@@ -719,7 +733,7 @@ const DecryptResponseSchema = SuccessResponseSchema.extend({
   })
 });
 
-const HashResponseSchema = SuccessResponseSchema.extend({
+const HashResponseSchema = TransitSuccessResponseSchema.extend({
   data: z.object({
     sum: z.string().optional(),
     batch_results: z
@@ -732,7 +746,7 @@ const HashResponseSchema = SuccessResponseSchema.extend({
   })
 });
 
-const HmacResponseSchema = SuccessResponseSchema.extend({
+const HmacResponseSchema = TransitSuccessResponseSchema.extend({
   data: z.object({
     hmac: z.string().optional(),
     batch_results: z
@@ -745,7 +759,7 @@ const HmacResponseSchema = SuccessResponseSchema.extend({
   })
 });
 
-const VerifyResponseSchema = SuccessResponseSchema.extend({
+const VerifyResponseSchema = TransitSuccessResponseSchema.extend({
   data: z.object({
     valid: z.boolean().optional(),
     batch_results: z
@@ -758,7 +772,7 @@ const VerifyResponseSchema = SuccessResponseSchema.extend({
   })
 });
 
-const SignResponseSchema = SuccessResponseSchema.extend({
+const SignResponseSchema = TransitSuccessResponseSchema.extend({
   data: z.object({
     signature: z.string().optional(),
     key_version: z.number().optional(),
@@ -773,7 +787,7 @@ const SignResponseSchema = SuccessResponseSchema.extend({
   })
 });
 
-const GenerateDataKeyResponseSchema = SuccessResponseSchema.extend({
+const GenerateDataKeyResponseSchema = TransitSuccessResponseSchema.extend({
   data: z.object({
     plaintext: z.string().optional(),
     ciphertext: z.string().optional(),
@@ -781,13 +795,13 @@ const GenerateDataKeyResponseSchema = SuccessResponseSchema.extend({
   })
 });
 
-const GenerateRandomResponseSchema = SuccessResponseSchema.extend({
+const GenerateRandomResponseSchema = TransitSuccessResponseSchema.extend({
   data: z.object({
     random_bytes: z.string()
   })
 });
 
-const ExportKeyResponseSchema = SuccessResponseSchema.extend({
+const ExportKeyResponseSchema = TransitSuccessResponseSchema.extend({
   data: z.object({
     name: z.string(),
     type: z.string(),

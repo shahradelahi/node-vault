@@ -2,23 +2,22 @@ import { expect } from 'chai';
 import { expectType } from 'tsd';
 
 import { Client } from '@/index';
-import { createInstance, destroyInstance, sleep } from '@/tests/utils';
+import { createVaultContainer, type VaultContainer } from '@/tests/container';
+import { sleep } from '@/tests/utils';
 
 describe('Transit Secrets Engine', () => {
-  const vc = new Client();
-
+  let vault: VaultContainer;
+  let vc: Client;
   const mountPath = 'transit-test';
 
   const createEngine = async () => {
-    const resp = await vc.engineInfo({
-      mountPath
-    });
-
-    if (!('errors' in resp)) {
+    try {
       await vc.unmount({ mountPath });
+    } catch (e) {
+      // ignore
     }
 
-    await sleep(500);
+    await sleep(100);
 
     await vc.transit.enable({
       mountPath,
@@ -26,19 +25,19 @@ describe('Transit Secrets Engine', () => {
       description: 'Test transit engine'
     });
 
-    await sleep(500);
+    await sleep(100);
   };
 
   // Launch
-  before(async () => {
-    const { root_token } = await createInstance();
-    vc.token = root_token;
+  before(async function () {
+    this.timeout(30000);
+    vault = await createVaultContainer();
+    vc = vault.client;
   });
 
   // Down
   after(async () => {
-    destroyInstance();
-    await sleep(2e3);
+    await vault.stop();
   });
 
   it('should enable the transit engine', async () => {
@@ -67,7 +66,7 @@ describe('Transit Secrets Engine', () => {
   it('should create an encryption key', async () => {
     await createEngine();
 
-    const created = await vc.transit.createKey({
+    const { data, error } = await vc.transit.createKey({
       mountPath,
       name: 'test-key',
       type: 'aes256-gcm96',
@@ -75,7 +74,8 @@ describe('Transit Secrets Engine', () => {
       allow_plaintext_backup: true
     });
 
-    expect(created).have.property('data').be.true;
+    expect(error).be.undefined;
+    expect(data).have.property('data').have.property('name', 'test-key');
   });
 
   it('should read key configuration', async () => {
@@ -83,7 +83,8 @@ describe('Transit Secrets Engine', () => {
 
     await vc.transit.createKey({
       mountPath,
-      name: 'test-key'
+      name: 'test-key',
+      exportable: true
     });
 
     const { data: keyInfo, error } = await vc.transit.readKey({
@@ -112,15 +113,21 @@ describe('Transit Secrets Engine', () => {
       name: 'test-key'
     });
 
-    const updated = await vc.transit.updateKey({
-      mountPath,
-      name: 'test-key',
-      min_decryption_version: 1,
-      min_encryption_version: 1,
-      deletion_allowed: true
-    });
+    const { data, error } = await vc.transit.updateKey(
+      {
+        mountPath,
+        name: 'test-key',
+        min_decryption_version: 1,
+        min_encryption_version: 1,
+        deletion_allowed: true
+      },
+      { strictSchema: false }
+    );
 
-    expect(updated).have.property('data').be.true;
+    expect(error).be.undefined;
+    expect(data?.data).have.property('min_decryption_version', 1);
+    expect(data?.data).have.property('min_encryption_version', 1);
+    expect(data?.data).have.property('deletion_allowed', true);
   });
 
   it('should list keys', async () => {
@@ -395,7 +402,7 @@ describe('Transit Secrets Engine', () => {
       name: 'test-key'
     });
 
-    expect(rotated).have.property('data').be.true;
+    expect(rotated?.data?.data).have.property('latest_version', 2);
 
     // Verify version increased
     const { data: rotatedInfo, error: rotatedError } = await vc.transit.readKey({

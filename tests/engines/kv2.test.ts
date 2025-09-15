@@ -2,39 +2,38 @@ import { expect } from 'chai';
 import { expectType } from 'tsd';
 
 import { Client } from '@/index';
-import { createInstance, destroyInstance, sleep } from '@/tests/utils';
+import { createVaultContainer, type VaultContainer } from '@/tests/container';
+import { sleep } from '@/tests/utils';
 
 describe('Key/Value Secrets Engine - Version 2', () => {
-  const vc = new Client();
-
+  let vault: VaultContainer;
+  let vc: Client;
   const mountPath = 'my-secret';
 
   const createEngine = async () => {
-    const resp = await vc.engineInfo({
-      mountPath
-    });
-
-    if (!('errors' in resp)) {
+    try {
       await vc.unmount({ mountPath });
+    } catch (e) {
+      // ignore
     }
 
-    await sleep(500);
+    await sleep(100);
 
     await vc.mount({ mountPath, type: 'kv-v2' });
 
-    await sleep(500);
+    await sleep(100);
   };
 
   // Launch
-  before(async () => {
-    const { root_token } = await createInstance();
-    vc.token = root_token;
+  before(async function () {
+    this.timeout(30000);
+    vault = await createVaultContainer();
+    vc = vault.client;
   });
 
   // Down
   after(async () => {
-    destroyInstance();
-    await sleep(2e3);
+    await vault.stop();
   });
 
   it('should mount the secrets engine', async () => {
