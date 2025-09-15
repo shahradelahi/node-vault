@@ -1,5 +1,18 @@
 # @litehex/node-vault
 
+## 1.1.0
+
+### Minor Changes
+
+- be9f59: feat: Add complete Transit Secrets Engine support with full API coverage
+  - Key management: create, read, update, delete, list, rotate, export, backup/restore
+  - Cryptographic operations: encrypt, decrypt, rewrap, sign, verify, HMAC
+  - Utility operations: generate random bytes, hash data, generate data keys
+  - Advanced features: batch operations, key trimming, convergent encryption
+  - Support for all Vault Transit key types and algorithms
+  - Comprehensive TypeScript types and Zod validation
+  - 18 passing tests covering all functionality
+
 ## 1.0.4
 
 ### Patch Changes

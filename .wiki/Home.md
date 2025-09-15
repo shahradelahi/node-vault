@@ -22,7 +22,7 @@ Welcome to the node-vault wiki!
 - [ ] [Terraform Cloud](https://developer.hashicorp.com/vault/api-docs/secret/terraform)
 - [ ] [TOTP](https://developer.hashicorp.com/vault/api-docs/secret/totp)
 - [ ] [Transform](https://developer.hashicorp.com/vault/api-docs/secret/transform)
-- [ ] [Transit](https://developer.hashicorp.com/vault/api-docs/secret/transit)
+- [x] [Transit](https://developer.hashicorp.com/vault/api-docs/secret/transit)
 
 ### Database
 
