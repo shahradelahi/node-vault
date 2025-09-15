@@ -1,5 +1,12 @@
 # @litehex/node-vault
 
+## 1.1.0
+
+### Minor Changes
+
+- ca8e7f0: feat: Add complete Transit Secrets Engine support with full API coverage
+- f5160ec: Node.js 18 reached End-of-Life on April 30, 2025, and this project no longer supports it.
+
 ## 1.0.4
 
 ### Patch Changes
@@ -35,7 +42,6 @@
 - f922ba9: BREAKING: The responses of commands are wrapped in a record with type of `SafeReturn<T, VaultError>`.
 
   This record contains two properties:
-
   - `data`: The `data` property for successful responses. The value depends on the command.
   - `error`: The `error` property for error responses. The type is `VaultError`, which is a subclass of `Error`.
 
