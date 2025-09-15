@@ -45,31 +45,31 @@
   "dependencies": {
     "lodash-es": "^4.17.21",
     "p-safe": "^1.0.0",
-    "zod": "^3.25.20",
+    "zod": "^3.25.76",
     "zod-request": "^0.2.2"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.29.4",
+    "@changesets/cli": "^2.29.5",
     "@shahrad/prettier-config": "^1.2.2",
-    "@shahrad/tsconfig": "^1.1.0",
+    "@shahrad/tsconfig": "^1.2.0",
     "@types/chai": "^5.2.2",
     "@types/lodash-es": "^4.17.12",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^20.17.50",
+    "@types/node": "^24.3.3",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
-    "chai": "^5.2.0",
-    "dotenv": "^16.5.0",
+    "chai": "^5.2.1",
+    "dotenv": "^17.2.2",
     "eslint": "^8.57.1",
-    "mocha": "^10.8.2",
-    "prettier": "^3.5.3",
+    "mocha": "^11.7.1",
+    "prettier": "^3.6.2",
     "testcontainers": "^10.16.0",
     "tsd": "^0.32.0",
     "tsup": "^8.5.0",
-    "tsx": "^4.19.4",
-    "typescript": "^5.8.3",
-    "undici": "^7.10.0"
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "undici": "^7.12.0"
   },
-  "packageManager": "pnpm@9.15.6",
+  "packageManager": "pnpm@10.16.1+sha512.0e155aa2629db8672b49e8475da6226aa4bdea85fdcdfdc15350874946d4f3c91faaf64cbdc4a5d1ab8002f473d5c3fcedcd197989cf0390f9badd3c04678706",
   "engines": {
     "node": ">=18.0.0"
   },
