@@ -4,6 +4,7 @@ import { Aws } from '@/engine/aws';
 import { Kubernetes } from '@/engine/kubernetes';
 import { Kv } from '@/engine/kv';
 import { Kv2 } from '@/engine/kv2';
+import { Transit } from '@/engine/transit';
 import {
   ClientOptionsSchema,
   EngineInfoSchema,
@@ -62,6 +63,13 @@ class Client {
    */
   get kv2() {
     return new Kv2(this);
+  }
+
+  /**
+   * Transit secrets engine
+   */
+  get transit() {
+    return new Transit(this);
   }
 
   /**
