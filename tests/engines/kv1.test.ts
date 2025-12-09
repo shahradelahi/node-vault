@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { Client } from '@/index';
 import { createVaultContainer, type VaultContainer } from '@/tests/container';
@@ -24,14 +24,13 @@ describe('Key/Value Secrets Engine - Version 1', () => {
   };
 
   // Launch
-  before(async function () {
-    this.timeout(30000);
+  beforeAll(async function () {
     vault = await createVaultContainer();
     vc = vault.client;
   });
 
   // Down
-  after(async () => {
+  afterAll(async () => {
     await vault.stop();
   });
 
@@ -42,14 +41,17 @@ describe('Key/Value Secrets Engine - Version 1', () => {
       type: 'kv'
     });
 
-    expect(mount).have.property('data').to.true;
+    expect(mount.data).toBe(true);
 
     // Verify
     const result = await vc.kv.info({
       mountPath
     });
 
-    expect(result).have.property('data').have.property('type', 'kv');
+    if (result.error) {
+      throw result.error;
+    }
+    expect(result.data.type).toBe('kv');
   });
 
   it('should create a secret path and write a new version', async () => {
@@ -63,8 +65,8 @@ describe('Key/Value Secrets Engine - Version 1', () => {
         foo: 'bar'
       }
     });
-    expect(write).not.have.property('error');
-    expect(write).have.property('data').be.a('boolean');
+    expect(write).not.toHaveProperty('error');
+    expect(write.data).toBeTypeOf('boolean');
 
     // Write new version
     const newWrite = await vc.kv.write({
@@ -74,8 +76,8 @@ describe('Key/Value Secrets Engine - Version 1', () => {
         baz: 'qux'
       }
     });
-    expect(newWrite).not.have.property('error');
-    expect(newWrite).have.property('data').be.a('boolean');
+    expect(newWrite).not.toHaveProperty('error');
+    expect(newWrite.data).toBeTypeOf('boolean');
   });
 
   it('should delete a secret path', async () => {
@@ -91,7 +93,7 @@ describe('Key/Value Secrets Engine - Version 1', () => {
       mountPath,
       path: 'new-test'
     });
-    expect(deleted).have.property('data').be.true;
+    expect(deleted.data).toBe(true);
   });
 
   it('should be able to read the secret', async () => {
@@ -108,8 +110,11 @@ describe('Key/Value Secrets Engine - Version 1', () => {
       path: 'new-test'
     });
 
-    expect(error).be.undefined;
-    expect(data).have.property('data').have.property('foo', 'bar');
+    expect(error).toBeUndefined();
+    if (error) {
+      throw error;
+    }
+    expect(data?.data?.['foo']).toBe('bar');
   });
 
   it('should list keys', async () => {
@@ -125,7 +130,10 @@ describe('Key/Value Secrets Engine - Version 1', () => {
       mountPath,
       path: 'deep'
     });
-    expect(error).be.undefined;
-    expect(keys).have.property('data').have.property('keys').to.include('new-secret');
+    expect(error).toBeUndefined();
+    if (error) {
+      throw error;
+    }
+    expect(keys?.data?.keys).toContain('new-secret');
   });
 });

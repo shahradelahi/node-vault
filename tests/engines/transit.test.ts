@@ -1,5 +1,4 @@
-import { expect } from 'chai';
-import { expectType } from 'tsd';
+import { afterAll, beforeAll, describe, expect, expectTypeOf, it } from 'vitest';
 
 import { Client } from '@/index';
 import { createVaultContainer, type VaultContainer } from '@/tests/container';
@@ -29,14 +28,13 @@ describe('Transit Secrets Engine', () => {
   };
 
   // Launch
-  before(async function () {
-    this.timeout(30000);
+  beforeAll(async function () {
     vault = await createVaultContainer();
     vc = vault.client;
   });
 
   // Down
-  after(async () => {
+  afterAll(async () => {
     await vault.stop();
   });
 
@@ -47,7 +45,7 @@ describe('Transit Secrets Engine', () => {
       description: 'Test transit engine'
     });
 
-    expect(enabled).have.property('data').to.true;
+    expect(enabled.data).toBe(true);
 
     // Verify
     const { data: info, error } = await vc.transit.info({
@@ -55,12 +53,12 @@ describe('Transit Secrets Engine', () => {
     });
 
     if (error) {
-      expectType<undefined>(info);
+      expectTypeOf<undefined>(info);
       return;
     }
 
-    expectType<undefined>(error);
-    expect(info).have.property('type', 'transit');
+    expectTypeOf<undefined>(error);
+    expect(info.type).toBe('transit');
   });
 
   it('should create an encryption key', async () => {
@@ -74,8 +72,11 @@ describe('Transit Secrets Engine', () => {
       allow_plaintext_backup: true
     });
 
-    expect(error).be.undefined;
-    expect(data).have.property('data').have.property('name', 'test-key');
+    expect(error).toBeUndefined();
+    if (error) {
+      throw error;
+    }
+    expect(data?.data?.name).toBe('test-key');
   });
 
   it('should read key configuration', async () => {
@@ -93,16 +94,16 @@ describe('Transit Secrets Engine', () => {
     });
 
     if (error) {
-      expectType<undefined>(keyInfo);
+      expectTypeOf<undefined>(keyInfo);
       return;
     }
 
-    expectType<undefined>(error);
-    expect(keyInfo).have.property('data');
-    expect(keyInfo?.data).have.property('type', 'aes256-gcm96');
-    expect(keyInfo?.data).have.property('supports_encryption', true);
-    expect(keyInfo?.data).have.property('supports_decryption', true);
-    expect(keyInfo?.data).have.property('exportable', true);
+    expectTypeOf<undefined>(error);
+    expect(keyInfo?.data).toBeDefined();
+    expect(keyInfo?.data.type).toBe('aes256-gcm96');
+    expect(keyInfo?.data.supports_encryption).toBe(true);
+    expect(keyInfo?.data.supports_decryption).toBe(true);
+    expect(keyInfo?.data.exportable).toBe(true);
   });
 
   it('should update key configuration', async () => {
@@ -124,10 +125,10 @@ describe('Transit Secrets Engine', () => {
       { strictSchema: false }
     );
 
-    expect(error).be.undefined;
-    expect(data?.data).have.property('min_decryption_version', 1);
-    expect(data?.data).have.property('min_encryption_version', 1);
-    expect(data?.data).have.property('deletion_allowed', true);
+    expect(error).toBeUndefined();
+    expect(data?.data.min_decryption_version).toBe(1);
+    expect(data?.data.min_encryption_version).toBe(1);
+    expect(data?.data.deletion_allowed).toBe(true);
   });
 
   it('should list keys', async () => {
@@ -148,15 +149,15 @@ describe('Transit Secrets Engine', () => {
     });
 
     if (error) {
-      expectType<undefined>(keys);
+      expectTypeOf<undefined>(keys);
       return;
     }
 
-    expectType<undefined>(error);
-    expect(keys).have.property('data');
-    expect(keys?.data).have.property('keys');
-    expect(keys?.data.keys).to.include('test-key-1');
-    expect(keys?.data.keys).to.include('test-key-2');
+    expectTypeOf<undefined>(error);
+    expect(keys?.data).toBeDefined();
+    expect(keys?.data.keys).toBeDefined();
+    expect(keys?.data.keys).toContain('test-key-1');
+    expect(keys?.data.keys).toContain('test-key-2');
   });
 
   it('should encrypt and decrypt data', async () => {
@@ -176,9 +177,10 @@ describe('Transit Secrets Engine', () => {
       plaintext
     });
 
-    expect(encryptError).be.undefined;
-    expect(encryptResult).have.property('data');
-    expect(encryptResult?.data).have.property('ciphertext');
+    expect(encryptError).toBeUndefined();
+    expect(encryptResult).toBeDefined();
+    expect(encryptResult?.data).toBeDefined();
+    expect(encryptResult?.data.ciphertext).toBeDefined();
 
     // Decrypt
     const { data: decryptResult, error: decryptError } = await vc.transit.decrypt({
@@ -187,9 +189,10 @@ describe('Transit Secrets Engine', () => {
       ciphertext: encryptResult?.data.ciphertext || ''
     });
 
-    expect(decryptError).be.undefined;
-    expect(decryptResult).have.property('data');
-    expect(decryptResult?.data).have.property('plaintext', plaintext);
+    expect(decryptError).toBeUndefined();
+    expect(decryptResult).toBeDefined();
+    expect(decryptResult?.data).toBeDefined();
+    expect(decryptResult?.data.plaintext).toBe(plaintext);
   });
 
   it('should rewrap data', async () => {
@@ -216,9 +219,10 @@ describe('Transit Secrets Engine', () => {
       ciphertext: encryptResult?.data.ciphertext || ''
     });
 
-    expect(rewrapError).be.undefined;
-    expect(rewrapResult).have.property('data');
-    expect(rewrapResult?.data).have.property('ciphertext');
+    expect(rewrapError).toBeUndefined();
+    expect(rewrapResult).toBeDefined();
+    expect(rewrapResult?.data).toBeDefined();
+    expect(rewrapResult?.data.ciphertext).toBeDefined();
   });
 
   it('should generate data key', async () => {
@@ -237,10 +241,11 @@ describe('Transit Secrets Engine', () => {
       bits: 256
     });
 
-    expect(wrappedError).be.undefined;
-    expect(wrappedKey).have.property('data');
-    expect(wrappedKey?.data).have.property('ciphertext');
-    expect(wrappedKey?.data).have.property('key_version');
+    expect(wrappedError).toBeUndefined();
+    expect(wrappedKey).toBeDefined();
+    expect(wrappedKey?.data).toBeDefined();
+    expect(wrappedKey?.data.ciphertext).toBeDefined();
+    expect(wrappedKey?.data.key_version).toBeDefined();
 
     // Generate plaintext data key
     const { data: plaintextKey, error: plaintextError } = await vc.transit.generateDataKey({
@@ -250,9 +255,10 @@ describe('Transit Secrets Engine', () => {
       bits: 256
     });
 
-    expect(plaintextError).be.undefined;
-    expect(plaintextKey).have.property('data');
-    expect(plaintextKey?.data).have.property('plaintext');
+    expect(plaintextError).toBeUndefined();
+    expect(plaintextKey).toBeDefined();
+    expect(plaintextKey?.data).toBeDefined();
+    expect(plaintextKey?.data.plaintext).toBeDefined();
   });
 
   it('should generate random bytes', async () => {
@@ -266,14 +272,14 @@ describe('Transit Secrets Engine', () => {
     });
 
     if (error) {
-      expectType<undefined>(randomBytes);
+      expectTypeOf<undefined>(randomBytes);
       return;
     }
 
-    expectType<undefined>(error);
-    expect(randomBytes).have.property('data');
-    expect(randomBytes?.data).have.property('random_bytes');
-    expect(randomBytes?.data.random_bytes).to.have.length(64); // 32 bytes = 64 hex chars
+    expectTypeOf<undefined>(error);
+    expect(randomBytes).toBeDefined();
+    expect(randomBytes?.data).toBeDefined();
+    expect(randomBytes?.data.random_bytes).toHaveLength(64);
   });
 
   it('should hash data', async () => {
@@ -289,14 +295,14 @@ describe('Transit Secrets Engine', () => {
     });
 
     if (error) {
-      expectType<undefined>(hashResult);
+      expectTypeOf<undefined>(hashResult);
       return;
     }
 
-    expectType<undefined>(error);
-    expect(hashResult).have.property('data');
-    expect(hashResult?.data).have.property('sum');
-    expect(hashResult?.data.sum).to.be.a('string');
+    expectTypeOf<undefined>(error);
+    expect(hashResult).toBeDefined();
+    expect(hashResult?.data).toBeDefined();
+    expect(hashResult?.data.sum).toBeTypeOf('string');
   });
 
   it('should generate and verify HMAC', async () => {
@@ -316,12 +322,13 @@ describe('Transit Secrets Engine', () => {
       input
     });
 
-    expect(hmacError).be.undefined;
-    expect(hmacResult).have.property('data');
-    expect(hmacResult?.data).have.property('hmac');
+    expect(hmacError).toBeUndefined();
+    expect(hmacResult).toBeDefined();
+    expect(hmacResult?.data).toBeDefined();
+    expect(hmacResult?.data.hmac).toBeDefined();
 
     // Verify HMAC
-    const { data: verifyResult, error: verifyError } = await vc.transit.verifyHmac({
+    const { data: verifyResult } = await vc.transit.verifyHmac({
       mountPath,
       name: 'test-key',
       algorithm: 'sha2-256',
@@ -329,9 +336,9 @@ describe('Transit Secrets Engine', () => {
       hmac: hmacResult?.data.hmac || ''
     });
 
-    expect(verifyError).be.undefined;
-    expect(verifyResult).have.property('data');
-    expect(verifyResult?.data).have.property('valid', true);
+    expect(verifyResult).toBeDefined();
+    expect(verifyResult?.data).toBeDefined();
+    expect(verifyResult?.data.valid).toBe(true);
   });
 
   it('should sign and verify data', async () => {
@@ -352,9 +359,10 @@ describe('Transit Secrets Engine', () => {
       input
     });
 
-    expect(signError).be.undefined;
-    expect(signResult).have.property('data');
-    expect(signResult?.data).have.property('signature');
+    expect(signError).toBeUndefined();
+    expect(signResult).toBeDefined();
+    expect(signResult?.data).toBeDefined();
+    expect(signResult?.data.signature).toBeDefined();
 
     // Verify
     const { data: verifyResult, error: verifyError } = await vc.transit.verify({
@@ -366,13 +374,14 @@ describe('Transit Secrets Engine', () => {
     });
 
     if (verifyError) {
-      expectType<undefined>(verifyResult);
+      expectTypeOf<undefined>(verifyResult);
       return;
     }
 
-    expectType<undefined>(verifyError);
-    expect(verifyResult).have.property('data');
-    expect(verifyResult?.data).have.property('valid', true);
+    expectTypeOf<undefined>(verifyError);
+    expect(verifyResult).toBeDefined();
+    expect(verifyResult?.data).toBeDefined();
+    expect(verifyResult?.data.valid).toBe(true);
   });
 
   it('should rotate key', async () => {
@@ -390,7 +399,7 @@ describe('Transit Secrets Engine', () => {
     });
 
     if (initialError) {
-      expectType<undefined>(initialInfo);
+      expectTypeOf<undefined>(initialInfo);
       return;
     }
 
@@ -402,7 +411,7 @@ describe('Transit Secrets Engine', () => {
       name: 'test-key'
     });
 
-    expect(rotated?.data?.data).have.property('latest_version', 2);
+    expect(rotated?.data?.data.latest_version).toBe(2);
 
     // Verify version increased
     const { data: rotatedInfo, error: rotatedError } = await vc.transit.readKey({
@@ -411,11 +420,11 @@ describe('Transit Secrets Engine', () => {
     });
 
     if (rotatedError) {
-      expectType<undefined>(rotatedInfo);
+      expectTypeOf<undefined>(rotatedInfo);
       return;
     }
 
-    expect(rotatedInfo?.data.latest_version).to.be.greaterThan(initialVersion);
+    expect(rotatedInfo?.data.latest_version).toBeGreaterThan(initialVersion);
   });
 
   it('should export key', async () => {
@@ -434,15 +443,16 @@ describe('Transit Secrets Engine', () => {
     });
 
     if (error) {
-      expectType<undefined>(exportResult);
+      expectTypeOf<undefined>(exportResult);
       return;
     }
 
-    expectType<undefined>(error);
-    expect(exportResult).have.property('data');
-    expect(exportResult?.data).have.property('name', 'test-key');
-    expect(exportResult?.data).have.property('type', 'aes256-gcm96');
-    expect(exportResult?.data).have.property('keys');
+    expectTypeOf<undefined>(error);
+    expect(exportResult).toBeDefined();
+    expect(exportResult?.data).toBeDefined();
+    expect(exportResult?.data.name).toBe('test-key');
+    expect(exportResult?.data.type).toBe('aes256-gcm96');
+    expect(exportResult?.data.keys).toBeDefined();
   });
 
   it('should backup and restore key', async () => {
@@ -461,13 +471,14 @@ describe('Transit Secrets Engine', () => {
     });
 
     if (backupError) {
-      expectType<undefined>(backupResult);
+      expectTypeOf<undefined>(backupResult);
       return;
     }
 
-    expectType<undefined>(backupError);
-    expect(backupResult).have.property('data');
-    expect(backupResult?.data).have.property('backup');
+    expectTypeOf<undefined>(backupError);
+    expect(backupResult).toBeDefined();
+    expect(backupResult?.data).toBeDefined();
+    expect(backupResult?.data.backup).toBeDefined();
 
     // Delete original key
     await vc.transit.deleteKey({
@@ -482,7 +493,7 @@ describe('Transit Secrets Engine', () => {
       backup: backupResult?.data.backup || ''
     });
 
-    expect(restored).have.property('data').be.true;
+    expect(restored.data).toBe(true);
 
     // Verify key exists
     const { data: keyInfo } = await vc.transit.readKey({
@@ -490,7 +501,7 @@ describe('Transit Secrets Engine', () => {
       name: 'test-key'
     });
 
-    expect(keyInfo?.data).have.property('type', 'aes256-gcm96');
+    expect(keyInfo?.data.type).toBe('aes256-gcm96');
   });
 
   it('should trim key versions', async () => {
@@ -536,12 +547,12 @@ describe('Transit Secrets Engine', () => {
     });
 
     if (trimError) {
-      expectType<undefined>(trimmed);
+      expectTypeOf<undefined>(trimmed);
       return;
     }
 
-    expectType<undefined>(trimError);
-    expect(trimmed).be.true;
+    expectTypeOf<undefined>(trimError);
+    expect(trimmed).toBe(true);
   });
 
   it('should delete key', async () => {
@@ -565,12 +576,12 @@ describe('Transit Secrets Engine', () => {
     });
 
     if (deleteError) {
-      expectType<undefined>(deleted);
+      expectTypeOf<undefined>(deleted);
       return;
     }
 
-    expectType<undefined>(deleteError);
-    expect(deleted).be.true;
+    expectTypeOf<undefined>(deleteError);
+    expect(deleted).toBe(true);
 
     // Verify key is deleted
     const { error } = await vc.transit.readKey({
@@ -578,7 +589,7 @@ describe('Transit Secrets Engine', () => {
       name: 'test-key'
     });
 
-    expect(error).to.exist;
+    expect(error).toBeDefined();
   });
 
   it('should handle batch operations', async () => {
@@ -600,10 +611,10 @@ describe('Transit Secrets Engine', () => {
       batch_input: [{ plaintext: plaintext1 }, { plaintext: plaintext2 }]
     });
 
-    expect(batchEncryptError).be.undefined;
-    expect(batchEncryptResult).have.property('data');
-    expect(batchEncryptResult?.data).have.property('batch_results');
-    expect(batchEncryptResult?.data.batch_results).to.have.length(2);
+    expect(batchEncryptError).toBeUndefined();
+    expect(batchEncryptResult).toBeDefined();
+    expect(batchEncryptResult?.data).toBeDefined();
+    expect(batchEncryptResult?.data.batch_results).toHaveLength(2);
 
     // Batch decrypt
     const { data: batchDecryptResult, error: batchDecryptError } = await vc.transit.decrypt({
@@ -616,11 +627,11 @@ describe('Transit Secrets Engine', () => {
       ]
     });
 
-    expect(batchDecryptError).be.undefined;
-    expect(batchDecryptResult).have.property('data');
-    expect(batchDecryptResult?.data).have.property('batch_results');
-    expect(batchDecryptResult?.data.batch_results).to.have.length(2);
-    expect(batchDecryptResult?.data.batch_results![0]?.plaintext).to.equal(plaintext1);
-    expect(batchDecryptResult?.data.batch_results![1]?.plaintext).to.equal(plaintext2);
+    expect(batchDecryptError).toBeUndefined();
+    expect(batchDecryptResult).toBeDefined();
+    expect(batchDecryptResult?.data).toBeDefined();
+    expect(batchDecryptResult?.data.batch_results).toHaveLength(2);
+    expect(batchDecryptResult?.data.batch_results![0]?.plaintext).toBe(plaintext1);
+    expect(batchDecryptResult?.data.batch_results![1]?.plaintext).toBe(plaintext2);
   });
 });
