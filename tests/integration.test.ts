@@ -1,9 +1,8 @@
-import { expect } from 'chai';
-import { expectType } from 'tsd';
 import { fetch, ProxyAgent } from 'undici';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import * as z from 'zod';
 
-import { Client, generateCommand, VaultError } from '@/index';
+import { Client, generateCommand } from '@/index';
 import { createVaultContainer, type VaultContainer } from '@/tests/container';
 import { sleep } from '@/tests/utils';
 
@@ -12,28 +11,33 @@ describe('node-vault', () => {
   let vc: Client;
 
   // Launch
-  before(async function () {
-    this.timeout(30000);
+  beforeAll(async function () {
     vault = await createVaultContainer();
     vc = vault.client;
   });
 
   // Down
-  after(async () => {
+  afterAll(async function () {
     await vault.stop();
   });
 
   it('should get vault health', async () => {
     const { data, error } = await vc.health();
-    expect(error).be.undefined;
-    expect(data).have.property('initialized').be.a('boolean').be.true;
+    expect(error).toBeUndefined();
+    if (error) {
+      throw error;
+    }
+    expect(data.initialized).toBe(true);
   });
 
   it('should get host info', async () => {
     const { data, error } = await vc.hostInfo();
-    expect(error).be.undefined;
-    expect(data).have.property('data').have.property('cpu').to.be.a('array');
-    expect(data).have.property('data').have.property('host').to.be.a('object');
+    expect(error).toBeUndefined();
+    if (error) {
+      throw error;
+    }
+    expect(data.data.cpu).toBeInstanceOf(Array);
+    expect(data.data.host).toBeTypeOf('object');
   });
 
   it('should be able to implement custom command', async () => {
@@ -48,27 +52,27 @@ describe('node-vault', () => {
 
     const { data, error } = await fooCommand();
     if (error) {
-      expectType<VaultError>(error);
-      expect(error).be.undefined;
+      throw error;
     }
-
-    expect(data).have.property('sealed').be.a('boolean');
+    expect(data.sealed).toBeTypeOf('boolean');
   });
 
   it('should get seal status', async () => {
     const { data, error } = await vc.sealStatus();
-    expect(error).be.undefined;
-
-    expect(data).have.property('sealed').be.a('boolean');
-    expect(data).have.property('t').be.a('number');
-    expect(data).have.property('n').be.a('number');
-    expect(data).have.property('progress').be.a('number');
-    expect(data).have.property('nonce').be.a('string');
-    expect(data).have.property('version').be.a('string');
-    expect(data).have.property('build_date').be.a('string');
-    expect(data).have.property('migration').be.a('boolean');
-    expect(data).have.property('recovery_seal').be.a('boolean');
-    expect(data).have.property('storage_type').be.a('string');
+    expect(error).toBeUndefined();
+    if (error) {
+      throw error;
+    }
+    expect(data.sealed).toBeTypeOf('boolean');
+    expect(data.t).toBeTypeOf('number');
+    expect(data.n).toBeTypeOf('number');
+    expect(data.progress).toBeTypeOf('number');
+    expect(data.nonce).toBeTypeOf('string');
+    expect(data.version).toBeTypeOf('string');
+    expect(data.build_date).toBeTypeOf('string');
+    expect(data.migration).toBeTypeOf('boolean');
+    expect(data.recovery_seal).toBeTypeOf('boolean');
+    expect(data.storage_type).toBeTypeOf('string');
   });
 
   it('should write, read and delete secret', async () => {
@@ -81,7 +85,7 @@ describe('node-vault', () => {
         version: 1
       }
     });
-    expect(mount).have.property('data', true);
+    expect(mount.data).toBe(true);
 
     await sleep(1e3);
 
@@ -91,27 +95,33 @@ describe('node-vault', () => {
         foo: 'bar'
       }
     });
-    expect(write).have.property('data').to.true;
+    expect(write.data).toBe(true);
 
     const read = await vc.read({
       path: `${mountPath}/test`
     });
-    expect(read.error).be.undefined;
-    expect(read?.data).have.property('data').have.property('foo', 'bar');
+    expect(read.error).toBeUndefined();
+    if (read.error) {
+      throw read.error;
+    }
+    expect(read.data?.['data']?.['foo']).toBe('bar');
 
     const deleted = await vc.delete({
       path: `${mountPath}/test`
     });
-    expect(deleted).have.property('data').to.true;
+    expect(deleted.data).toBe(true);
   });
 
   it('should implement a custom fetcher', async () => {
     let used = false;
     const fancyFetcher = async (url: URL, init: RequestInit) => {
-      expect(init).have.property('headers').have.property('X-Vault-Token').to.be.a('string');
-      expect(init).have.property('method').to.be.equal('POST');
-      expect(url).to.be.instanceof(URL);
-      expect(url.toString()).to.equal(`${vc.endpoint}/v1/secret-path/test`);
+      if (!init.headers) {
+        throw new Error('Headers are undefined');
+      }
+      expect((init.headers as Record<string, string>)['X-Vault-Token']).toBeTypeOf('string');
+      expect(init.method).toBe('POST');
+      expect(url).toBeInstanceOf(URL);
+      expect(url.toString()).toBe(`${vc.endpoint}/v1/secret-path/test`);
       used = true;
       // @ts-expect-error Init type has some missing properties
       return fetch(url, init);
@@ -128,22 +138,24 @@ describe('node-vault', () => {
       }
     });
 
-    expect(write).have.property('data').to.true;
-    expect(used).be.true;
+    expect(write.data).toBe(true);
+    expect(used).toBe(true);
 
     delete vc.fetcher;
 
     const read = await vc.read({
       path: 'secret-path/test'
     });
-
-    expect(read).have.property('data').have.property('data').have.property('foo', 'bar');
+    if (read.error) {
+      throw read.error;
+    }
+    expect(read.data?.['data']?.['foo']).toBe('bar');
   });
 
   it('should support proxy', async function () {
     const { HTTP_PROXY } = process.env;
     if (!HTTP_PROXY) {
-      return this.skip();
+      return;
     }
 
     const agent = new ProxyAgent(HTTP_PROXY);
@@ -151,6 +163,9 @@ describe('node-vault', () => {
 
     const status = await vc.sealStatus(undefined, { dispatcher: agent });
 
-    expect(status).have.property('data').have.property('sealed').be.a('boolean');
+    if (status.error) {
+      throw status.error;
+    }
+    expect(status.data.sealed).toBeTypeOf('boolean');
   });
 });

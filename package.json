@@ -39,7 +39,7 @@
     "lint": "pnpm typecheck && eslint .",
     "lint:fix": "eslint --fix .",
     "prepublishOnly": "pnpm build && pnpm test && pnpm lint && pnpm format:check",
-    "test": "mocha",
+    "test": "vitest --run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -50,24 +50,19 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.5",
+    "@edge-runtime/vm": "^5.0.0",
     "@shahrad/prettier-config": "^1.2.2",
     "@shahrad/tsconfig": "^1.2.0",
-    "@types/chai": "^5.2.2",
     "@types/lodash-es": "^4.17.12",
-    "@types/mocha": "^10.0.10",
     "@types/node": "^24.3.3",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
-    "chai": "^5.2.1",
-    "dotenv": "^17.2.2",
     "eslint": "^8.57.1",
-    "mocha": "^11.7.1",
     "prettier": "^3.6.2",
     "testcontainers": "^10.16.0",
-    "tsd": "^0.32.0",
     "tsup": "^8.5.0",
-    "tsx": "^4.20.5",
     "typescript": "^5.9.2",
-    "undici": "^7.12.0"
+    "undici": "^7.12.0",
+    "vitest": "^4.0.15"
   },
   "packageManager": "pnpm@10.16.1+sha512.0e155aa2629db8672b49e8475da6226aa4bdea85fdcdfdc15350874946d4f3c91faaf64cbdc4a5d1ab8002f473d5c3fcedcd197989cf0390f9badd3c04678706",
   "engines": {
