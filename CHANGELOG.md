@@ -1,5 +1,11 @@
 # @litehex/node-vault
 
+## 1.1.1
+
+### Patch Changes
+
+- 210f155: refactor(client): Improve generateCommand header and schema handling
+
 ## 1.1.0
 
 ### Minor Changes
