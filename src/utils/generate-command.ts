@@ -57,24 +57,23 @@ export function generateCommand<Schema extends RequestSchema, RawResponse extend
               )
             ) as any),
 
-      headers: removeUndefined(
-        Object.assign(
-          {
-            'X-Vault-Token': client.token,
-            'X-Vault-Namespace': client.namespace
-          },
-          opts.headers || {}
-        )
-      ),
+      headers: removeUndefined({
+        'X-Vault-Token': client.token,
+        'X-Vault-Namespace': client.namespace,
+        ...(opts.headers || {})
+      }),
 
-      schema: Object.assign(schema, {
-        response: z.union([
-          schema.response ?? z.any(),
-          z.object({
-            errors: z.array(z.string())
-          })
-        ])
-      })
+      schema: strictSchema
+        ? {
+            ...schema,
+            response: z.union([
+              schema.response ?? z.any(),
+              z.object({
+                errors: z.array(z.string())
+              })
+            ])
+          }
+        : z.any()
     } as ZodRequestInit<any, any>;
 
     const { url: _url, input } = generateRequest(
