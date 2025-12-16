@@ -1,5 +1,11 @@
 # @litehex/node-vault
 
+## 1.1.2
+
+### Patch Changes
+
+- edb24e7: refactor: Replace `lodash-es` with `@se-oss/object`
+
 ## 1.1.1
 
 ### Patch Changes
