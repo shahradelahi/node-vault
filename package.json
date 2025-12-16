@@ -43,7 +43,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "lodash-es": "^4.17.21",
+    "@se-oss/object": "^1.0.0",
     "p-safe": "^1.0.0",
     "zod": "^3.25.76",
     "zod-request": "^0.2.2"
@@ -54,7 +54,6 @@
     "@shahrad/eslint-config": "^1.0.1",
     "@shahrad/prettier-config": "^1.2.2",
     "@shahrad/tsconfig": "^1.2.0",
-    "@types/lodash-es": "^4.17.12",
     "@types/node": "^24.3.3",
     "eslint": "^9.39.1",
     "globals": "^16.5.0",

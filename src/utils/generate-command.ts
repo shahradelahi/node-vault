@@ -1,4 +1,4 @@
-import { omit, pick } from 'lodash-es';
+import { omit, pick, removeUndefined } from '@se-oss/object';
 import { trySafe, type SafeReturn } from 'p-safe';
 import * as z from 'zod';
 import {
@@ -12,7 +12,6 @@ import { VaultError } from '@/errors';
 import type { CommandInit, CommandOptions, Infer, RequestSchema } from '@/typings';
 
 import { isJson } from './json';
-import { removeUndefined } from './object';
 
 export function generateCommand<Schema extends RequestSchema, RawResponse extends boolean = false>(
   init: CommandInit<Schema, RawResponse>,
@@ -35,20 +34,20 @@ export function generateCommand<Schema extends RequestSchema, RawResponse extend
       ...opts,
       path:
         schema?.path && typeof schema?.path === 'object'
-          ? pick(args || {}, Object.keys(schema.path.shape))
+          ? pick<any, any>(args || {}, Object.keys(schema.path.shape))
           : undefined,
 
       params:
         schema?.searchParams && typeof schema?.searchParams === 'object'
-          ? pick(args || {}, Object.keys(schema.searchParams.shape))
+          ? pick<any, any>(args || {}, Object.keys(schema.searchParams.shape))
           : undefined,
 
       body: !schema?.body
         ? undefined
         : schema.body instanceof z.ZodObject
-          ? pick(args || {}, Object.keys(schema.body.shape))
+          ? pick<any, any>(args || {}, Object.keys(schema.body.shape))
           : (removeUndefined(
-              omit(
+              omit<any, any>(
                 args,
                 // Potential Body Keys
                 Object.keys(schema.searchParams?.shape || {})
