@@ -29,6 +29,16 @@ export function generateCommand<Schema extends RequestSchema, RawResponse extend
     const { method = 'GET', path, client, schema } = init;
     const { strictSchema = true, ...opts } = options;
 
+    // Update schema.response to include error format
+    if (strictSchema) {
+      schema.response = z.union([
+        schema.response ?? z.any(),
+        z.object({
+          errors: z.array(z.string())
+        })
+      ]);
+    }
+
     const requestInit = {
       method,
       ...opts,
@@ -62,17 +72,7 @@ export function generateCommand<Schema extends RequestSchema, RawResponse extend
         ...(opts.headers || {})
       }),
 
-      schema: strictSchema
-        ? {
-            ...schema,
-            response: z.union([
-              schema.response ?? z.any(),
-              z.object({
-                errors: z.array(z.string())
-              })
-            ])
-          }
-        : z.any()
+      schema: strictSchema ? schema : z.any()
     } as ZodRequestInit<any, any>;
 
     const { url: _url, input } = generateRequest(
