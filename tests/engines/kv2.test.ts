@@ -273,4 +273,25 @@ describe('Key/Value Secrets Engine - Version 2', () => {
     }
     expect(config.data?.data?.max_versions).toBe(10);
   });
+
+  it('should handle 404 error when reading non-existent secret', async () => {
+    await createEngine();
+
+    // Try to read a secret that doesn't exist
+    const { data, error } = await vc.kv2.read({
+      mountPath,
+      path: 'non-existent-secret-path-12345'
+    });
+
+    // Should have an error, not data
+    expect(error).toBeDefined();
+    expect(data).toBeUndefined();
+
+    // The error should be a VaultError with a proper message
+    if (error) {
+      expect(error.constructor.name).toBe('VaultError');
+      expect(error.message).toBe('Not Found');
+      expect(error.message.length).toBeGreaterThan(0);
+    }
+  });
 });
