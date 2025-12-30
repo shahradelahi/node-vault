@@ -1,5 +1,11 @@
 # @litehex/node-vault
 
+## 1.1.3
+
+### Patch Changes
+
+- 77b9aa6: fix(client): restore schema mutation for proper error response handling
+
 ## 1.1.2
 
 ### Patch Changes
