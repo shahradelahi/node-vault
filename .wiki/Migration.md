@@ -14,7 +14,7 @@ Your editor/IDE might not detect any errors, so please make sure to update and v
 ###### Example
 
 ```typescript
-import { VaultError, Client } from '@litehex/node-vault';
+import { Client, VaultError } from '@litehex/node-vault';
 
 const { data, error } = await vc.write({
   path: 'secret/test',
