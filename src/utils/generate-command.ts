@@ -124,7 +124,7 @@ export function generateCommand<Schema extends RequestSchema, RawResponse extend
 
       // From here it might throw a schema validation error
       try {
-        const zr = new ZodResponse(response, schema.response);
+        const zr = new ZodResponse(response, schema.response as any);
 
         if (hasJsonContentType) {
           return resolve(response, await zr.json());

@@ -177,10 +177,11 @@ class Client {
       schema: {
         response: SuccessResponseSchema.extend({
           data: z.record(
+            z.string(),
             z.object({
               type: z.string(),
               description: z.string(),
-              options: z.record(z.any())
+              options: z.record(z.string(), z.any())
             })
           )
         })
@@ -445,7 +446,7 @@ class Client {
       path: '/sys/generate-root/attempt',
       client: this,
       schema: {
-        response: z.record(z.any())
+        response: z.record(z.string(), z.any())
       }
     });
   }
@@ -499,7 +500,7 @@ class Client {
           lease_id: z.string(),
           lease_duration: z.number(),
           renewable: z.boolean(),
-          data: z.record(EngineInfoSchema),
+          data: z.record(z.string(), EngineInfoSchema),
           warnings: z.array(z.string()).nullable()
         })
       }
@@ -523,8 +524,8 @@ class Client {
         body: z.object({
           type: z.string(),
           description: z.string().optional(),
-          config: z.record(z.any()).optional(),
-          options: z.record(z.any()).optional()
+          config: z.record(z.string(), z.any()).optional(),
+          options: z.record(z.string(), z.any()).optional()
         })
       }
     });
