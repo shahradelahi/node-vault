@@ -75,7 +75,7 @@ export class Kv2 extends ApiSector {
         }),
         response: SuccessResponseSchema.extend({
           data: z.object({
-            data: z.record(z.string()),
+            data: z.record(z.string(), z.string()),
             metadata: MetadataSchema
           })
         })
@@ -99,7 +99,7 @@ export class Kv2 extends ApiSector {
           path: z.string()
         }),
         body: z.object({
-          data: z.record(z.any()),
+          data: z.record(z.string(), z.any()),
           options: PostOptionsSchema.optional()
         }),
         response: SuccessResponseSchema.extend({
@@ -131,7 +131,7 @@ export class Kv2 extends ApiSector {
           path: z.string()
         }),
         body: z.object({
-          data: z.record(z.any()),
+          data: z.record(z.string(), z.any()),
           options: PostOptionsSchema.optional()
         }),
         response: z.object({
@@ -163,7 +163,7 @@ export class Kv2 extends ApiSector {
         response: SuccessResponseSchema.extend({
           data: z.object({
             metadata: MetadataSchema,
-            subkeys: z.record(z.any())
+            subkeys: z.record(z.string(), z.any())
           })
         })
       }
@@ -303,12 +303,13 @@ export class Kv2 extends ApiSector {
             cas_required: z.boolean(),
             created_time: z.string(),
             current_version: z.number(),
-            custom_metadata: z.record(z.string()).nullable(),
+            custom_metadata: z.record(z.string(), z.string()).nullable(),
             delete_version_after: z.string(),
             max_versions: z.number(),
             oldest_version: z.number(),
             updated_time: z.string(),
             versions: z.record(
+              z.string(),
               z.object({
                 created_time: z.string(),
                 deletion_time: z.string(),
@@ -409,7 +410,7 @@ export class Kv2 extends ApiSector {
 
 const MetadataSchema = z.object({
   created_time: z.string(),
-  custom_metadata: z.record(z.string()).nullable(),
+  custom_metadata: z.record(z.string(), z.string()).nullable(),
   deletion_time: z.string(),
   destroyed: z.boolean(),
   version: z.number()
@@ -419,7 +420,7 @@ const MetadataRequestBodySchema = z.object({
   max_versions: z.number().optional(),
   cas_required: z.boolean().optional(),
   delete_version_after: z.string().optional(),
-  custom_metadata: z.record(z.string()).nullable().optional()
+  custom_metadata: z.record(z.string(), z.string()).nullable().optional()
 });
 
 const PostOptionsSchema = z.object({

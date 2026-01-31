@@ -669,7 +669,7 @@ const TransitKey = z.object({
   derived: z.boolean(),
   exportable: z.boolean(),
   imported_key: z.boolean().optional(),
-  keys: z.record(z.number()),
+  keys: z.record(z.string(), z.number()),
   latest_version: z.number(),
   min_available_version: z.number(),
   min_decryption_version: z.number(),
@@ -805,6 +805,6 @@ const ExportKeyResponseSchema = TransitSuccessResponseSchema.extend({
   data: z.object({
     name: z.string(),
     type: z.string(),
-    keys: z.record(z.string())
+    keys: z.record(z.string(), z.string())
   })
 });
