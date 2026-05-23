@@ -67,7 +67,8 @@ export class Kv2 extends ApiSector {
       client: this.client,
       refine: (init, args) => {
         if (args?.version !== undefined) {
-          init.url.searchParams.set('version', String(args.version));
+          const version = z.number().int().positive().parse(args.version);
+          init.url.searchParams.set('version', String(version));
         }
         return init;
       },
