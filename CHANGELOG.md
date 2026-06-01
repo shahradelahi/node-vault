@@ -1,5 +1,11 @@
 # @litehex/node-vault
 
+## 1.1.4
+
+### Patch Changes
+
+- 0030a98: chore: update dependencies
+
 ## 1.1.3
 
 ### Patch Changes
