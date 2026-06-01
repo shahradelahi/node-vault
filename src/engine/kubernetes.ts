@@ -89,8 +89,8 @@ export class Kubernetes extends ApiSector {
           kubernetes_role_type: z.string().optional(),
           generated_role_rules: z.string().optional(),
           name_template: z.string().optional(),
-          extra_annotations: z.record(z.string()).optional(),
-          extra_labels: z.record(z.string()).optional()
+          extra_annotations: z.record(z.string(), z.string()).optional(),
+          extra_labels: z.record(z.string(), z.string()).optional()
         }),
         response: ZodAnyRecord
       }

@@ -34,6 +34,7 @@
   "scripts": {
     "build": "tsup",
     "ci:publish": "changeset publish",
+    "clean": "git clean -dfx node_modules dist .tsbuildinfo",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "pnpm typecheck && eslint .",
@@ -43,28 +44,31 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@se-oss/object": "^1.0.0",
-    "p-safe": "^1.0.0",
-    "zod": "^3.25.76",
-    "zod-request": "^0.2.2"
+    "@se-oss/object": "^1.1.0",
+    "p-safe": "^1.1.0",
+    "zod-request": "^1.0.1"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.29.5",
+    "@changesets/cli": "^2.31.0",
     "@edge-runtime/vm": "^5.0.0",
-    "@shahrad/eslint-config": "^1.0.1",
+    "@shahrad/eslint-config": "^1.1.0",
     "@shahrad/prettier-config": "^1.2.2",
     "@shahrad/tsconfig": "^1.2.0",
-    "@types/node": "^24.3.3",
-    "eslint": "^9.39.1",
-    "globals": "^16.5.0",
-    "prettier": "^3.6.2",
-    "testcontainers": "^10.16.0",
-    "tsup": "^8.5.0",
-    "typescript": "^5.9.2",
-    "undici": "^7.12.0",
-    "vitest": "^4.0.15"
+    "@types/node": "^25.9.1",
+    "eslint": "^10.4.1",
+    "globals": "^17.6.0",
+    "prettier": "^3.8.3",
+    "testcontainers": "^11.14.0",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "undici": "^7.26.0",
+    "vitest": "^4.1.7",
+    "zod": "^4.4.3"
   },
-  "packageManager": "pnpm@10.16.1+sha512.0e155aa2629db8672b49e8475da6226aa4bdea85fdcdfdc15350874946d4f3c91faaf64cbdc4a5d1ab8002f473d5c3fcedcd197989cf0390f9badd3c04678706",
+  "peerDependencies": {
+    "zod": "^3.0.0 || ^4.0.0-0"
+  },
+  "packageManager": "pnpm@10.34.1+sha512.b58fbde6dca66a929538021581f648b4570b6ca19b18e7cbd7f2c07a7b24454155388dacdf08f2af3678e88a6d1fe04f9d609df24bf51735a060ea041b374ab7",
   "engines": {
     "node": ">=20.0.0"
   },

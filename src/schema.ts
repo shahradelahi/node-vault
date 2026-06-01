@@ -10,11 +10,11 @@ export const AuthSchema = z.object({
 
 export const EngineInfoSchema = z.object({
   accessor: z.string(),
-  config: z.record(z.any()).nullable(),
+  config: z.record(z.string(), z.any()).nullable(),
   description: z.string(),
   external_entropy_access: z.boolean(),
   local: z.boolean(),
-  options: z.record(z.any()).nullable(),
+  options: z.record(z.string(), z.any()).nullable(),
   plugin_version: z.string(),
   running_plugin_version: z.string(),
   running_sha256: z.string(),
@@ -28,9 +28,9 @@ export const SuccessResponseSchema = z.object({
   lease_id: z.string(),
   renewable: z.boolean(),
   lease_duration: z.number(),
-  wrap_info: z.record(z.any()).nullable(),
-  warnings: z.record(z.any()).nullable(),
-  auth: z.record(z.any()).nullable()
+  wrap_info: z.record(z.string(), z.any()).nullable(),
+  warnings: z.record(z.string(), z.any()).nullable(),
+  auth: z.record(z.string(), z.any()).nullable()
 });
 
 export const ClientOptionsSchema = z.object({
@@ -41,4 +41,4 @@ export const ClientOptionsSchema = z.object({
   namespace: z.string().optional()
 });
 
-export const ZodAnyRecord = z.record(z.any());
+export const ZodAnyRecord = z.record(z.string(), z.any());
