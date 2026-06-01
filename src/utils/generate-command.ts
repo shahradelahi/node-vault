@@ -80,7 +80,7 @@ export function generateCommand<Schema extends RequestSchema, RawResponse extend
       requestInit
     );
 
-    return trySafe(async () => {
+    return trySafe<any, VaultError>(async () => {
       const fetcher = init.fetcher || client.fetcher || fetch;
 
       const rawInit = Object.assign(input as RequestInit, {
