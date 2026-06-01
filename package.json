@@ -1,6 +1,6 @@
 {
   "name": "@litehex/node-vault",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "private": false,
   "description": "A client for the HashiCorp's Vault API written for Node.js",
   "keywords": [
@@ -46,29 +46,29 @@
   "dependencies": {
     "@se-oss/object": "^1.1.0",
     "p-safe": "^1.1.0",
-    "zod-request": "^1.0.1"
+    "zod-request": "^1.0.2"
   },
   "devDependencies": {
     "@changesets/cli": "^2.31.0",
     "@edge-runtime/vm": "^5.0.0",
     "@shahrad/eslint-config": "^1.1.0",
     "@shahrad/prettier-config": "^1.2.2",
-    "@shahrad/tsconfig": "^1.2.0",
-    "@types/node": "^25.9.1",
-    "eslint": "^10.4.1",
+    "@shahrad/tsconfig": "^1.3.0",
+    "@types/node": "^25.9.3",
+    "eslint": "^10.5.0",
     "globals": "^17.6.0",
-    "prettier": "^3.8.3",
-    "testcontainers": "^11.14.0",
+    "prettier": "^3.8.4",
+    "testcontainers": "^12.0.1",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
-    "undici": "^7.26.0",
-    "vitest": "^4.1.7",
+    "undici": "^8.3.0",
+    "vitest": "^4.1.9",
     "zod": "^4.4.3"
   },
   "peerDependencies": {
     "zod": "^3.0.0 || ^4.0.0-0"
   },
-  "packageManager": "pnpm@10.34.1+sha512.b58fbde6dca66a929538021581f648b4570b6ca19b18e7cbd7f2c07a7b24454155388dacdf08f2af3678e88a6d1fe04f9d609df24bf51735a060ea041b374ab7",
+  "packageManager": "pnpm@10.34.3+sha512.f2c531b08829d7be7f03c90addc266615f9c5477463e4bf1d275cb263ce9ea57cf0d5599110d94649a9bb3fed9f0b5efcea74a7016b61532a24cb9ad87860c1d",
   "engines": {
     "node": ">=20.0.0"
   },
