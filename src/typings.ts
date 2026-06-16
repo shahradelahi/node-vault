@@ -12,7 +12,7 @@ export interface RequestSchema {
   body?: z.ZodObject<any> | z.ZodRecord<any>;
   searchParams?: z.ZodObject<any>;
   headers?: z.ZodObject<any>;
-  response?: z.ZodType<unknown>;
+  response?: z.ZodType;
 }
 
 export interface Fetcher {

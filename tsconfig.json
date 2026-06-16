@@ -3,10 +3,9 @@
   "extends": "@shahrad/tsconfig",
   "compilerOptions": {
     "outDir": "dist",
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@/tests/*": ["tests/*"]
+      "@/*": ["./src/*"],
+      "@/tests/*": ["./tests/*"]
     }
   },
   "include": ["**/*.ts"],
