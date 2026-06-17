@@ -65,13 +65,17 @@ export class Kv2 extends ApiSector {
       method: 'GET',
       path: '/{{mountPath}}/data/{{path}}',
       client: this.client,
+      refine: (init, args) => {
+        if (args?.version !== undefined) {
+          const version = z.number().int().positive().parse(args.version);
+          init.url.searchParams.set('version', String(version));
+        }
+        return init;
+      },
       schema: {
         path: z.object({
           mountPath: z.string(),
           path: z.string()
-        }),
-        searchParams: z.object({
-          version: z.number().optional()
         }),
         response: SuccessResponseSchema.extend({
           data: z.object({
