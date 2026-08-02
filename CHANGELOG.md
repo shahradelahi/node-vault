@@ -1,5 +1,11 @@
 # @litehex/node-vault
 
+## 1.1.6
+
+### Patch Changes
+
+- 01ae08e: fix: refactor exports structure in `package.json`
+
 ## 1.1.5
 
 ### Patch Changes
