@@ -7,9 +7,7 @@ different way. Here is an example of how to do that:
 import { Client } from '@litehex/node-vault';
 import { z } from 'zod';
 
-const vc = new Client({
-  /** ... */
-});
+const vc = new Client({/** ... */});
 
 const status = generateCommand({
   path: '/sys/seal-status',
