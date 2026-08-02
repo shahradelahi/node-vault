@@ -21,12 +21,13 @@
   "exports": {
     ".": {
       "import": "./dist/index.js",
+      "types": "./dist/index.d.ts",
       "default": "./dist/index.cjs"
     }
   },
   "main": "dist/index.cjs",
   "module": "dist/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "dist/index.d.ts",
   "files": [
     "dist/**",
     "!dist/**/*.d.cts"
