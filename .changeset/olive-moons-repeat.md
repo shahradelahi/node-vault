@@ -2,4 +2,4 @@
 '@litehex/node-vault': patch
 ---
 
-fix: publish CJS type declarations
+fix: refactor exports structure in `package.json`
