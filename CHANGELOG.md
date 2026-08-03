@@ -1,5 +1,11 @@
 # @litehex/node-vault
 
+## 1.1.7
+
+### Patch Changes
+
+- 011fb5d: Fix type declarations export for CommonJS resolution by including `.d.cts` files and referencing them under the `require` export condition.
+
 ## 1.1.6
 
 ### Patch Changes
